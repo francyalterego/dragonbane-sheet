@@ -24,18 +24,20 @@ export const HEADER: Record<string, FieldPos> = {
   nome: { x: 306, y: 665, size: 13, align: 'center' },
 };
 
+// Centri dei cerchi misurati per analisi pixel (fanno parte dell'immagine di sfondo,
+// non sono oggetti vettoriali: la posizione delle etichette testuali non basta a dedurli).
 export const ATTRIBUTE_X: Record<string, number> = {
-  FOR: 153.35,
-  COS: 211.09,
-  AGI: 270.59,
-  INT: 328.61,
-  VOL: 386.21,
-  CAR: 444.4,
+  FOR: 160.5,
+  COS: 218.3,
+  AGI: 276.3,
+  INT: 334.9,
+  VOL: 393.0,
+  CAR: 450.6,
 };
 
-export const ATTRIBUTE_VALUE_Y = 617;
+export const ATTRIBUTE_VALUE_Y = 626;
 export const CONDITION_Y = 592.45;
-export const CONDITION_CHECK_DX = -22; // offset checkbox rispetto all'inizio della parola
+export const CONDITION_CHECK_DX = -29; // offset checkbox rispetto al centro del cerchio attributo
 
 export const DANNO_MOVIMENTO: Record<string, FieldPos> = {
   dannoBonusFor: { x: 148, y: 554.38, size: 8 },
@@ -89,7 +91,7 @@ export const RESOURCES: Record<string, FieldPos> = {
   argento: { x: 90, y: 244.91, size: 7.5 },
   rame: { x: 90, y: 215.12, size: 7.5 },
   oggettiMinuscoli: { x: 462, y: 265, size: 7 },
-  pesoTrasportabile: { x: 560, y: 536.13, size: 7, align: 'center' },
+  pesoTrasportabile: { x: 600, y: 536.13, size: 6.5, align: 'right' },
 };
 
 export const ARMOR: Record<string, FieldPos> = {

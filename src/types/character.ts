@@ -52,6 +52,9 @@ export interface Character {
 
   attributes: Record<Attribute, number | ''>;
   conditions: Record<Condition, boolean>;
+  // Modificatore per età attualmente applicato agli attributi (per mostrare "+1 età" ecc.
+  // e per poter cambiare età più volte senza sommare gli effetti). Non finisce sul PDF.
+  appliedAgeDelta: Partial<Record<Attribute, number>>;
 
   dannoBonusFor: string;
   dannoBonusAgi: string;
@@ -131,6 +134,7 @@ export function createEmptyCharacter(): Character {
     debolezza: '',
     aspetto: ['', '', ''],
     attributes: { FOR: '', COS: '', AGI: '', INT: '', VOL: '', CAR: '' },
+    appliedAgeDelta: {},
     conditions: {
       ESAUSTO: false,
       MALATICCIO: false,

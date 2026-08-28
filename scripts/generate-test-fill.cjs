@@ -18,10 +18,10 @@ const HEADER = {
   nome: { x: 306, y: 665, size: 13, align: 'center' },
 };
 
-const ATTRIBUTE_X = { FOR: 153.35, COS: 211.09, AGI: 270.59, INT: 328.61, VOL: 386.21, CAR: 444.4 };
-const ATTRIBUTE_VALUE_Y = 617;
+const ATTRIBUTE_X = { FOR: 160.5, COS: 218.3, AGI: 276.3, INT: 334.9, VOL: 393.0, CAR: 450.6 };
+const ATTRIBUTE_VALUE_Y = 626;
 const CONDITION_Y = 592.45;
-const CONDITION_CHECK_DX = -22;
+const CONDITION_CHECK_DX = -29;
 
 const DANNO_MOVIMENTO = {
   dannoBonusFor: { x: 148, y: 554.38, size: 8 },
@@ -94,7 +94,7 @@ function drawCheck(page, font, x, y, size = 8) {
   drawText(page, font, 'Mantello verde', HEADER.aspetto3);
   drawText(page, fontBold, 'Aldric Silente', HEADER.nome);
 
-  const attrVals = { FOR: 12, COS: 14, AGI: 16, INT: 10, VOL: 13, CAR: 8 };
+  const attrVals = { FOR: 11, COS: 9, AGI: 16, INT: 12, VOL: 12, CAR: 15 };
   for (const [attr, x] of Object.entries(ATTRIBUTE_X)) {
     drawText(page, fontBold, attrVals[attr], { x, y: ATTRIBUTE_VALUE_Y, size: 11, align: 'center' });
   }

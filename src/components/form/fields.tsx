@@ -57,6 +57,36 @@ export function NumberField({
   );
 }
 
+export function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+  className = '',
+  placeholder = '—',
+}: {
+  label?: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: readonly string[];
+  className?: string;
+  placeholder?: string;
+}) {
+  return (
+    <label className={`flex flex-col gap-1 text-xs text-parchment-200/80 ${className}`}>
+      {label && <span>{label}</span>}
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full">
+        <option value="">{placeholder}</option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 export function Checkbox({
   label,
   checked,

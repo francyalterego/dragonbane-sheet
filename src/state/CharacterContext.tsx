@@ -1,5 +1,6 @@
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
-import { Character, createEmptyCharacter } from '../types/character';
+import { Attribute, Character, createEmptyCharacter } from '../types/character';
+import { AGE_DELTAS, EtaCategoria } from '../data/dragonbaneData';
 
 const STORAGE_KEY = 'dragonbane-character-v1';
 
@@ -8,6 +9,7 @@ interface Ctx {
   setCharacter: Dispatch<SetStateAction<Character>>;
   update: <K extends keyof Character>(key: K, value: Character[K]) => void;
   resetCharacter: () => void;
+  applyAgeCategory: (eta: EtaCategoria) => void;
 }
 
 const CharacterCtx = createContext<Ctx | null>(null);
@@ -39,8 +41,23 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
 
   const resetCharacter = () => setCharacter(createEmptyCharacter());
 
+  const applyAgeCategory = (eta: EtaCategoria) => {
+    setCharacter((prev) => {
+      const attributes = { ...prev.attributes };
+      // annulla il modificatore d'età applicato in precedenza, prima di applicare quello nuovo
+      for (const k of Object.keys(prev.appliedAgeDelta) as Attribute[]) {
+        if (attributes[k] !== '') attributes[k] = (attributes[k] as number) - (prev.appliedAgeDelta[k] ?? 0);
+      }
+      const delta = AGE_DELTAS[eta];
+      for (const k of Object.keys(delta) as Attribute[]) {
+        if (attributes[k] !== '') attributes[k] = Math.min(18, (attributes[k] as number) + (delta[k] ?? 0));
+      }
+      return { ...prev, eta, attributes, appliedAgeDelta: delta };
+    });
+  };
+
   return (
-    <CharacterCtx.Provider value={{ character, setCharacter, update, resetCharacter }}>
+    <CharacterCtx.Provider value={{ character, setCharacter, update, resetCharacter, applyAgeCategory }}>
       {children}
     </CharacterCtx.Provider>
   );

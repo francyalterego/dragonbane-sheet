@@ -14,16 +14,25 @@ export function CaratteristicheSection() {
       <AttributeRoller />
 
       <div className="mt-4 grid grid-cols-6 gap-2">
-        {ATTRIBUTES.map((attr) => (
-          <NumberField
-            key={attr}
-            label={attr}
-            min={3}
-            max={18}
-            value={character.attributes[attr]}
-            onChange={(v) => update('attributes', { ...character.attributes, [attr]: v })}
-          />
-        ))}
+        {ATTRIBUTES.map((attr) => {
+          const delta = character.appliedAgeDelta[attr];
+          return (
+            <div key={attr}>
+              <NumberField
+                label={attr}
+                min={3}
+                max={18}
+                value={character.attributes[attr]}
+                onChange={(v) => update('attributes', { ...character.attributes, [attr]: v })}
+              />
+              {!!delta && (
+                <p className="mt-0.5 text-[10px] text-parchment-200/45">
+                  {delta > 0 ? `+${delta}` : delta} età
+                </p>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">

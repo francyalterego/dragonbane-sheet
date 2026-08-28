@@ -1,27 +1,44 @@
-# React + TypeScript + Vite
+# Scheda Dragonbane
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+App per compilare la scheda personaggio di [Dragonbane](https://freeleaguepublishing.com/games/dragonbane/)
+direttamente nel browser e scaricarla come PDF pronto per la stampa — senza backend, senza database,
+niente lascia il tuo computer.
 
-Currently, two official plugins are available:
+## Come funziona
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Il template PDF originale (piatto, senza campi modulo) è incluso nell'app in `src/assets/scheda-template.pdf`.
+Quando compili il form, [pdf-lib](https://pdf-lib.js.org/) scrive i valori sul PDF alle coordinate esatte
+di ogni campo (mappate in `src/pdf/fieldMap.ts`), tutto lato client. L'anteprima a schermo usa
+[pdf.js](https://mozilla.github.io/pdf.js/) per renderizzare il risultato in tempo reale.
 
-## Expanding the ESLint configuration
+## Sviluppo locale
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
+```bash
+npm install
+npm run dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Build di produzione
+
+```bash
+npm run build
+```
+
+Genera una cartella `dist/` statica, distribuibile ovunque (GitHub Pages, Netlify, Vercel, o anche
+aperta localmente da file).
+
+## Deploy su GitHub Pages
+
+Il workflow in `.github/workflows/deploy.yml` builda e pubblica automaticamente ad ogni push su `main`.
+Basta abilitare, nelle impostazioni del repository (Settings → Pages), "Source: GitHub Actions".
+
+## Ricalibrare le posizioni dei campi sul PDF
+
+Se cambi il template PDF o noti un campo leggermente disallineato, modifica le coordinate in
+`src/pdf/fieldMap.ts` (origine in basso a sinistra, in punti PDF) e verifica con:
+
+```bash
+node scripts/generate-test-fill.cjs
+```
+
+che genera `test-fill.pdf` con dati di prova su tutti i campi.

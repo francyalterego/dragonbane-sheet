@@ -12,26 +12,16 @@ const ATTR_LABELS: Record<Attribute, string> = {
   CAR: 'Carisma',
 };
 
-type AgeOption = 'giovane' | 'adulto' | 'vecchio';
-
-const AGE_DELTAS: Record<AgeOption, Partial<Record<Attribute, number>>> = {
-  giovane: { AGI: 1, COS: 1 },
-  adulto: {},
-  vecchio: { FOR: -2, AGI: -2, COS: -2, INT: 1, VOL: 1 },
-};
-
 function rollD6() {
   return 1 + Math.floor(Math.random() * 6);
 }
 
 export function AttributeRoller() {
-  const { character, update, setCharacter } = useCharacter();
+  const { character, update } = useCharacter();
   const [dice, setDice] = useState<number[] | null>(null);
   const [discardedIndex, setDiscardedIndex] = useState<number | null>(null);
   const [rolling, setRolling] = useState(false);
   const [swapFirst, setSwapFirst] = useState<Attribute | null>(null);
-  const [age, setAge] = useState<AgeOption | ''>('');
-  const [appliedAgeDelta, setAppliedAgeDelta] = useState<Partial<Record<Attribute, number>> | null>(null);
 
   const assignedAttrs = ATTRIBUTES.filter((a) => character.attributes[a] !== '');
   const unassignedAttrs = ATTRIBUTES.filter((a) => character.attributes[a] === '');
@@ -79,30 +69,13 @@ export function AttributeRoller() {
     setSwapFirst(null);
   }
 
-  function applyAge(next: AgeOption) {
-    setCharacter((prev) => {
-      const attrs = { ...prev.attributes };
-      if (appliedAgeDelta) {
-        for (const k of Object.keys(appliedAgeDelta) as Attribute[]) {
-          if (attrs[k] !== '') attrs[k] = (attrs[k] as number) - (appliedAgeDelta[k] ?? 0);
-        }
-      }
-      const delta = AGE_DELTAS[next];
-      for (const k of Object.keys(delta) as Attribute[]) {
-        if (attrs[k] !== '') attrs[k] = Math.min(18, (attrs[k] as number) + (delta[k] ?? 0));
-      }
-      return { ...prev, attributes: attrs };
-    });
-    setAppliedAgeDelta(AGE_DELTAS[next]);
-    setAge(next);
-  }
-
   return (
     <div className="rounded-lg border border-dragon-gold/30 bg-black/20 p-4">
       <h3 className="section-title text-dragon-gold text-sm mb-2">Generazione Attributi</h3>
       <p className="text-xs text-parchment-200/70 mb-3">
         Tira 4D6, scarta il peggiore (cliccalo per cambiarlo), poi assegna il totale a un attributo a tua scelta.
-        Puoi scambiare due valori già assegnati e applicare l'aggiustamento per età.
+        Puoi scambiare due valori già assegnati. Ricorda di impostare l'età in Anagrafica: applica in automatico
+        l'aggiustamento agli attributi (pag. 24 del manuale).
       </p>
 
       {!allAssigned && (
@@ -167,26 +140,6 @@ export function AttributeRoller() {
                 ].join(' ')}
               >
                 {a}: {character.attributes[a]}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {allAssigned && (
-        <div className="mt-4 border-t border-dragon-gold/20 pt-3">
-          <p className="text-xs text-parchment-200/70 mb-1.5">Aggiustamento per età:</p>
-          <div className="flex gap-1.5">
-            {(['giovane', 'adulto', 'vecchio'] as AgeOption[]).map((opt) => (
-              <button
-                key={opt}
-                onClick={() => applyAge(opt)}
-                className={[
-                  'rounded border px-2 py-1 text-xs capitalize',
-                  age === opt ? 'border-dragon-gold bg-dragon-gold/30' : 'border-dragon-gold/40 hover:bg-dragon-gold/10',
-                ].join(' ')}
-              >
-                {opt}
               </button>
             ))}
           </div>
