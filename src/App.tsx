@@ -31,7 +31,7 @@ function AppInner() {
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 lg:flex-row">
-        <div className="flex flex-1 flex-col gap-4 lg:max-w-2xl">
+        <div className="flex flex-col gap-4 lg:w-[640px] lg:flex-shrink-0">
           <AnagraficaSection />
           <CaratteristicheSection />
           <AbilitaSection />
@@ -40,7 +40,7 @@ function AppInner() {
           <CombattimentoSection />
           <RisorseSection />
         </div>
-        <div className="lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:w-[38vw] lg:min-w-[520px] lg:max-w-[700px] lg:flex-shrink-0">
+        <div className="min-w-0 flex-1 lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)]">
           <PdfPreview />
         </div>
       </main>

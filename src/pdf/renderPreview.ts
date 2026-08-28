@@ -9,7 +9,7 @@ export async function renderPdfToCanvas(pdfBytes: Uint8Array, canvas: HTMLCanvas
   const loadingTask = pdfjsLib.getDocument({ data: pdfBytes.slice() });
   const doc = await loadingTask.promise;
   const page = await doc.getPage(1);
-  const scale = 2.4;
+  const scale = 3;
   const viewport = page.getViewport({ scale });
 
   const ctx = canvas.getContext('2d');
