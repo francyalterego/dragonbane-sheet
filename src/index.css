@@ -35,6 +35,13 @@ textarea:focus {
   border-color: #c8a24a;
 }
 
+/* Il colore/sfondo del <select> chiuso non si propaga alla lista opzioni:
+   il browser la disegna con il suo tema di default (chiaro), va stilizzata a parte. */
+select option {
+  background-color: #1a160f;
+  color: #ede3cc;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
 }

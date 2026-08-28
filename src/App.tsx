@@ -40,7 +40,7 @@ function AppInner() {
           <CombattimentoSection />
           <RisorseSection />
         </div>
-        <div className="lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:w-[420px] lg:flex-shrink-0">
+        <div className="lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:w-[38vw] lg:min-w-[520px] lg:max-w-[700px] lg:flex-shrink-0">
           <PdfPreview />
         </div>
       </main>
