@@ -1,5 +1,5 @@
 import { useCharacter } from '../../state/CharacterContext';
-import { ASPETTI, DEBOLEZZE, ETA_CATEGORIE, EtaCategoria, PROFESSIONI, STIRPI } from '../../data/dragonbaneData';
+import { ASPETTI, DEBOLEZZE, ETA_CATEGORIE, EtaCategoria, PROFESSIONI, STIRPI, STIRPI_INFO } from '../../data/dragonbaneData';
 import { SectionCard, SelectField, TextField } from './fields';
 
 const ALTRO = 'Altro';
@@ -13,11 +13,26 @@ export function AnagraficaSection() {
 
   const debolezzaIsCustom =
     character.debolezza !== '' && !DEBOLEZZE.some((d) => d.label === character.debolezza);
+  const kin = STIRPI_INFO.find((k) => k.nome === character.stirpe);
 
   return (
     <SectionCard title="Anagrafica">
       <div className="grid grid-cols-2 gap-3">
-        <TextField label="Nome del personaggio" value={character.nome} onChange={(v) => update('nome', v)} className="col-span-2" />
+        <label className="col-span-2 flex flex-col gap-1 text-xs text-parchment-200/80">
+          <span>Nome del personaggio</span>
+          <div className="flex gap-2">
+            <input type="text" className="flex-1" value={character.nome} onChange={(e) => update('nome', e.target.value)} />
+            <button
+              type="button"
+              disabled={!kin}
+              title={kin ? `Tira D6 sui nomi ${kin.nome} (pag. 12-15)` : 'Scegli prima la stirpe'}
+              onClick={() => kin && update('nome', kin.nomi[Math.floor(Math.random() * kin.nomi.length)])}
+              className="shrink-0 rounded border border-dragon-gold/40 px-2 py-1.5 text-sm hover:bg-dragon-gold/10 disabled:opacity-30"
+            >
+              🎲
+            </button>
+          </div>
+        </label>
         <TextField label="Giocatore" value={character.giocatore} onChange={(v) => update('giocatore', v)} />
 
         <SelectField label="Stirpe" value={character.stirpe} onChange={(v) => update('stirpe', v)} options={STIRPI} />
@@ -58,32 +73,58 @@ export function AnagraficaSection() {
           )}
         </div>
 
-        {([0, 1, 2] as const).map((i) => (
-          <div key={i} className="col-span-2 flex items-end gap-2">
-            <TextField
-              label={`Aspetto (riga ${i + 1})`}
-              value={character.aspetto[i]}
-              onChange={(v) => {
-                const next: [string, string, string] = [...character.aspetto];
-                next[i] = v;
-                update('aspetto', next);
-              }}
-              className="flex-1"
-            />
-            <button
-              type="button"
-              title="Tira sulla tabella Aspetto del manuale (pag. 29)"
-              onClick={() => {
-                const next: [string, string, string] = [...character.aspetto];
-                next[i] = rollAspetto();
-                update('aspetto', next);
-              }}
-              className="rounded border border-dragon-gold/40 px-2 py-1.5 text-sm hover:bg-dragon-gold/10"
-            >
-              🎲
-            </button>
-          </div>
-        ))}
+        {([0, 1, 2] as const).map((i) => {
+          const isCustom = character.aspetto[i] !== '' && !ASPETTI.includes(character.aspetto[i]);
+          return (
+            <div key={i} className="col-span-2 flex flex-col gap-1.5">
+              <label className="flex flex-col gap-1 text-xs text-parchment-200/80">
+                <span>Aspetto (riga {i + 1})</span>
+                <div className="flex gap-2">
+                  <select
+                    className="flex-1"
+                    value={isCustom ? ALTRO : character.aspetto[i]}
+                    onChange={(e) => {
+                      const next: [string, string, string] = [...character.aspetto];
+                      next[i] = e.target.value === ALTRO ? '' : e.target.value;
+                      update('aspetto', next);
+                    }}
+                  >
+                    <option value="">—</option>
+                    {ASPETTI.map((a) => (
+                      <option key={a} value={a}>
+                        {a}
+                      </option>
+                    ))}
+                    <option value={ALTRO}>Altro (scrivi tu)</option>
+                  </select>
+                  <button
+                    type="button"
+                    title="Tira D20 sulla tabella Aspetto (pag. 29)"
+                    onClick={() => {
+                      const next: [string, string, string] = [...character.aspetto];
+                      next[i] = rollAspetto();
+                      update('aspetto', next);
+                    }}
+                    className="shrink-0 rounded border border-dragon-gold/40 px-2 py-1.5 text-sm hover:bg-dragon-gold/10"
+                  >
+                    🎲
+                  </button>
+                </div>
+              </label>
+              {isCustom && (
+                <TextField
+                  value={character.aspetto[i]}
+                  onChange={(v) => {
+                    const next: [string, string, string] = [...character.aspetto];
+                    next[i] = v;
+                    update('aspetto', next);
+                  }}
+                  placeholder="Scrivi un tratto d'aspetto"
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
     </SectionCard>
   );

@@ -9,16 +9,19 @@ export interface Ability {
 }
 
 // pag. 12-15: capacità innata di ogni stirpe (i mallardi ne hanno due, le altre stirpi una sola)
+// e le rispettive tabelle D6 di nomi tipici.
 export interface Kin {
   nome: string;
   movimento: number;
   capacitaInnate: Ability[];
+  nomi: string[];
 }
 
 export const STIRPI_INFO: Kin[] = [
   {
     nome: 'Umano',
     movimento: 10,
+    nomi: ['Joruna', 'Tym', 'Halvelda', 'Garmander', 'Verolun', 'Lothar'],
     capacitaInnate: [
       {
         nome: 'Adattabile',
@@ -31,6 +34,7 @@ export const STIRPI_INFO: Kin[] = [
   {
     nome: 'Halfling',
     movimento: 8,
+    nomi: ['Schiocco', 'Brina', 'Casaletto', 'Bombo', 'Pervinca', 'Teolina'],
     capacitaInnate: [
       {
         nome: 'Difficile da Prendere',
@@ -42,6 +46,7 @@ export const STIRPI_INFO: Kin[] = [
   {
     nome: 'Nano',
     movimento: 8,
+    nomi: ['Tinderrock', 'Halwyld', 'Tymolana', 'Traut', 'Urd', 'Fermer'],
     capacitaInnate: [
       {
         nome: 'Rancoroso',
@@ -54,6 +59,7 @@ export const STIRPI_INFO: Kin[] = [
   {
     nome: 'Elfo',
     movimento: 10,
+    nomi: ['Arasin', 'Illyriana', 'Galvander', 'Tyrindelia', 'Erwilnor', 'Andremone'],
     capacitaInnate: [
       {
         nome: 'Pace Interiore',
@@ -66,6 +72,7 @@ export const STIRPI_INFO: Kin[] = [
   {
     nome: 'Mallardo',
     movimento: 8,
+    nomi: ['Qwacksum', 'Splats', 'Mogghi', 'Groddy', 'Blisandina', 'Gonfiapiume'],
     capacitaInnate: [
       {
         nome: 'Scontroso',
@@ -83,6 +90,7 @@ export const STIRPI_INFO: Kin[] = [
   {
     nome: 'Lupinide',
     movimento: 12,
+    nomi: ['Wyld', 'Ombralupo', 'Lunariem', 'Obdurian', 'Mordigelo', 'Wuldenhall'],
     capacitaInnate: [
       {
         nome: 'Istinti da Cacciatore',

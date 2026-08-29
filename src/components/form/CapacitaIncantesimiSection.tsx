@@ -26,7 +26,8 @@ function AbilityCard({
         </p>
         <button
           type="button"
-          onClick={() => onInsert(`${ability.nome}: ${ability.descrizione}`)}
+          onClick={() => onInsert(ability.nome)}
+          title="Sulla scheda va solo il titolo: qui sotto resta la descrizione completa per consultarla"
           className="shrink-0 rounded border border-dragon-gold/40 px-2 py-0.5 text-[10px] hover:bg-dragon-gold/10"
         >
           Inserisci
@@ -48,8 +49,9 @@ export function CapacitaIncantesimiSection() {
     <SectionCard title="Capacità e Incantesimi">
       <p className="mb-3 text-[11px] text-parchment-200/50">
         Pag. 11 e 26 del manuale: la capacità innata (dalla stirpe) e la capacità eroica iniziale (dalla professione)
-        vanno scritte qui. Scegli stirpe e professione in Anagrafica, poi premi "Inserisci" per aggiungerle in fondo
-        alla lista qui sotto.
+        vanno scritte qui. Scegli stirpe e professione in Anagrafica, poi premi "Inserisci" per aggiungere il nome in
+        fondo alla lista (la scheda ha spazio solo per il titolo; la descrizione resta qui sotto come promemoria). Le
+        righe restano libere: puoi scrivere anche altro.
       </p>
 
       {kin && (
@@ -59,7 +61,7 @@ export function CapacitaIncantesimiSection() {
           </p>
           <div className="flex flex-col gap-1.5">
             {kin.capacitaInnate.map((a) => (
-              <AbilityCard key={a.nome} ability={a} onInsert={(t) => update('capacitaIncantesimi', insertLine(character.capacitaIncantesimi, t))} />
+              <AbilityCard key={a.nome} ability={a} onInsert={(nome) => update('capacitaIncantesimi', insertLine(character.capacitaIncantesimi, nome))} />
             ))}
           </div>
         </div>
@@ -100,7 +102,7 @@ export function CapacitaIncantesimiSection() {
             )}
             <AbilityCard
               ability={prof.capacitaEroica[Math.min(heroicChoice, prof.capacitaEroica.length - 1)]}
-              onInsert={(t) => update('capacitaIncantesimi', insertLine(character.capacitaIncantesimi, t))}
+              onInsert={(nome) => update('capacitaIncantesimi', insertLine(character.capacitaIncantesimi, nome))}
             />
           </div>
         )

@@ -66,3 +66,22 @@ export const COPRICAPI: ArmorStats[] = [
   { nome: 'Celata', valore: 1, valoreLabel: '+1', sciagure: ['Consapevolezza'] },
   { nome: 'Grande Elmo', valore: 2, valoreLabel: '+2', sciagure: ['Consapevolezza', 'Attacchi a Distanza'] },
 ];
+
+export function applyArmor(stats: ArmorStats) {
+  return {
+    nome: stats.nome,
+    valore: stats.valore,
+    sciaguraSgattaiolare: stats.sciagure.includes('Sgattaiolare'),
+    sciaguraSfuggire: stats.sciagure.includes('Sfuggire'),
+    sciaguraAcrobazia: stats.sciagure.includes('Acrobazia'),
+  };
+}
+
+export function applyHelmet(stats: ArmorStats) {
+  return {
+    nome: stats.nome,
+    valore: stats.valore,
+    sciaguraConsapevolezza: stats.sciagure.includes('Consapevolezza'),
+    sciaguraAttacchiADistanza: stats.sciagure.includes('Attacchi a Distanza'),
+  };
+}

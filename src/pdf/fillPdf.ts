@@ -24,6 +24,38 @@ function drawText(
   page.drawText(text, { x, y: pos.y, size, font, color: INK });
 }
 
+function wrapLines(font: PDFFont, text: string, size: number, maxWidth: number): string[] {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let current = '';
+  for (const word of words) {
+    const test = current ? `${current} ${word}` : word;
+    if (current && font.widthOfTextAtSize(test, size) > maxWidth) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+function drawWrappedText(
+  page: PDFPage,
+  font: PDFFont,
+  text: string,
+  x: number,
+  y: number,
+  opts: { maxWidth: number; lineHeight: number; maxLines: number; size: number }
+) {
+  if (!text) return;
+  const lines = wrapLines(font, text, opts.size, opts.maxWidth).slice(0, opts.maxLines);
+  lines.forEach((line, i) => {
+    page.drawText(line, { x, y: y - i * opts.lineHeight, size: opts.size, font, color: INK });
+  });
+}
+
 function drawCheck(page: PDFPage, font: PDFFont, x: number, y: number, size = 8) {
   page.drawText('X', { x, y, size, font, color: INK });
 }
@@ -39,10 +71,14 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
   drawText(page, font, character.stirpe, F.HEADER.stirpe);
   drawText(page, font, character.eta, F.HEADER.eta);
   drawText(page, font, character.professione, F.HEADER.professione);
-  drawText(page, font, character.debolezza, F.HEADER.debolezza);
-  drawText(page, font, character.aspetto[0], F.HEADER.aspetto1);
-  drawText(page, font, character.aspetto[1], F.HEADER.aspetto2);
-  drawText(page, font, character.aspetto[2], F.HEADER.aspetto3);
+  drawWrappedText(page, font, character.debolezza, F.HEADER.debolezza.x, F.HEADER.debolezza.y, {
+    ...F.DEBOLEZZA_WRAP,
+    size: F.HEADER.debolezza.size ?? 6.5,
+  });
+  character.aspetto.forEach((text, i) => {
+    const pos = F.ASPETTO[i];
+    drawWrappedText(page, font, text, pos.x, pos.y, pos);
+  });
   drawText(page, fontBold, character.nome, F.HEADER.nome);
 
   for (const attr of ATTRIBUTES) {
@@ -119,7 +155,10 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
       size: F.INVENTORY.size,
     });
   });
-  drawText(page, font, character.cimelio, { x: F.INVENTORY.cimelioX, y: F.INVENTORY.cimelioY, size: F.INVENTORY.size });
+  drawWrappedText(page, font, character.cimelio, F.INVENTORY.cimelioX, F.INVENTORY.cimelioY, {
+    ...F.INVENTORY.cimelioWrap,
+    size: F.INVENTORY.size,
+  });
 
   drawText(page, font, character.oggettiMinuscoli, F.RESOURCES.oggettiMinuscoli);
   drawText(page, font, character.pesoTrasportabile, F.RESOURCES.pesoTrasportabile);
@@ -149,10 +188,10 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
   if (character.intervalloDiRiposo)
     drawCheck(page, font, F.RIPOSO.intervalloDiRiposo.x, F.RIPOSO.intervalloDiRiposo.y, 7);
 
-  const volontaTxt = `${character.puntiVolontaAttuali || 0} / ${character.puntiVolontaMax || 0}`;
-  drawText(page, fontBold, volontaTxt, F.PV_PF.volontaLabel);
-  const feritaTxt = `${character.puntiFeritaAttuali || 0} / ${character.puntiFeritaMax || 0}`;
-  drawText(page, fontBold, feritaTxt, F.PV_PF.feritaLabel);
+  if (character.puntiVolontaMax !== '')
+    drawText(page, fontBold, String(character.puntiVolontaMax), F.PV_PF.volontaMax);
+  if (character.puntiFeritaMax !== '')
+    drawText(page, fontBold, String(character.puntiFeritaMax), F.PV_PF.feritaMax);
 
   for (let i = 0; i < character.tiriMorteSuccessi; i++) {
     drawCheck(page, font, F.TIRI_MORTE.successiX + i * 12, F.TIRI_MORTE.y, F.TIRI_MORTE.size);

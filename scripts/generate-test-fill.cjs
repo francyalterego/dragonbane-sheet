@@ -11,12 +11,15 @@ const HEADER = {
   stirpe: { x: 70, y: 744, size: 8 },
   eta: { x: 168, y: 744, size: 8 },
   professione: { x: 112, y: 727, size: 8 },
-  debolezza: { x: 112, y: 709, size: 8 },
-  aspetto1: { x: 462, y: 761, size: 7 },
-  aspetto2: { x: 413, y: 744, size: 7 },
-  aspetto3: { x: 413, y: 727, size: 7 },
-  nome: { x: 306, y: 665, size: 13, align: 'center' },
+  debolezza: { x: 112, y: 709, size: 6.5 },
+  nome: { x: 306, y: 671, size: 13, align: 'center' },
 };
+const DEBOLEZZA_WRAP = { maxWidth: 290, lineHeight: 8, maxLines: 3 };
+const ASPETTO = [
+  { x: 462, y: 761, size: 6.5, maxWidth: 140, lineHeight: 7.5, maxLines: 2 },
+  { x: 413, y: 744, size: 6.5, maxWidth: 190, lineHeight: 7.5, maxLines: 2 },
+  { x: 413, y: 727, size: 6.5, maxWidth: 190, lineHeight: 7.5, maxLines: 2 },
+];
 
 const ATTRIBUTE_X = { FOR: 160.5, COS: 218.3, AGI: 276.3, INT: 334.9, VOL: 393.0, CAR: 450.6 };
 const ATTRIBUTE_VALUE_Y = 626;
@@ -33,13 +36,13 @@ const CAPACITA = { x: 22, yStart: 507, rowHeight: 12.6, size: 7 };
 const SKILLS = { nameX: 221.24, valueX: 200, yStart: 496.05, rowHeight: 14.175, size: 8 };
 const WEAPON_SKILLS = { nameX: 348.01, valueX: 325, yStart: 481.87, rowHeight: 14.175, size: 8 };
 const SECONDARY_SKILLS = { nameX: 348.01, valueX: 325, yStart: 311.79, rowHeight: 14.175, size: 7.5 };
-const INVENTORY = { valueX: 470, yStart: 498.91, rowHeight: 14.175, size: 7.5, cimelioY: 340, cimelioX: 452 };
+const INVENTORY = { valueX: 470, yStart: 498.91, rowHeight: 14.175, size: 7.5, cimelioY: 340, cimelioX: 452, cimelioWrap: { maxWidth: 148, lineHeight: 8.5, maxLines: 3 } };
 const RESOURCES = {
   oro: { x: 90, y: 274.39, size: 7.5 },
   argento: { x: 90, y: 244.91, size: 7.5 },
   rame: { x: 90, y: 215.12, size: 7.5 },
   oggettiMinuscoli: { x: 462, y: 265, size: 7 },
-  pesoTrasportabile: { x: 560, y: 536.13, size: 7, align: 'center' },
+  pesoTrasportabile: { x: 600, y: 536.13, size: 6.5, align: 'right' },
 };
 const ARMOR = {
   armaturaNome: { x: 100, y: 165, size: 7 },
@@ -49,15 +52,15 @@ const ARMOR = {
 };
 const WEAPONS_TABLE = {
   nomeX: 55.64, impX: 142.52, portataX: 172.49, dannoX: 220.51, durabX: 265.02, qualitaX: 309.34,
-  yStart: 78, rowHeight: 14.5, size: 7,
+  yStart: 78, rowHeight: 14.5, size: 6.5,
 };
 const RIPOSO = {
   roundDiRiposo: { x: 405, y: 185.5 },
   intervalloDiRiposo: { x: 487, y: 185.5 },
 };
 const PV_PF = {
-  volontaLabel: { x: 500, y: 163.07, size: 9, align: 'center' },
-  feritaLabel: { x: 500, y: 96.87, size: 9, align: 'center' },
+  volontaMax: { x: 421, y: 150, size: 10, align: 'left' },
+  feritaMax: { x: 421, y: 83.5, size: 10, align: 'left' },
 };
 const TIRI_MORTE = { successiX: 490, fallimentiX: 536, y: 38, size: 9 };
 
@@ -76,6 +79,29 @@ function drawText(page, font, text, pos, fallbackSize = 8) {
 function drawCheck(page, font, x, y, size = 8) {
   page.drawText('X', { x, y, size, font, color: INK });
 }
+function wrapLines(font, text, size, maxWidth) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = '';
+  for (const word of words) {
+    const test = current ? `${current} ${word}` : word;
+    if (current && font.widthOfTextAtSize(test, size) > maxWidth) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+function drawWrappedText(page, font, text, x, y, opts) {
+  if (!text) return;
+  const lines = wrapLines(font, text, opts.size, opts.maxWidth).slice(0, opts.maxLines);
+  lines.forEach((line, i) => {
+    page.drawText(line, { x, y: y - i * opts.lineHeight, size: opts.size, font, color: INK });
+  });
+}
 
 (async () => {
   const bytes = fs.readFileSync(path.join(__dirname, '..', 'src/assets/scheda-template.pdf'));
@@ -86,19 +112,23 @@ function drawCheck(page, font, x, y, size = 8) {
 
   drawText(page, font, 'Mario Rossi', HEADER.giocatore);
   drawText(page, font, 'Umano', HEADER.stirpe);
-  drawText(page, font, '27', HEADER.eta);
+  drawText(page, font, 'Adulto', HEADER.eta);
   drawText(page, font, 'Cacciatore', HEADER.professione);
-  drawText(page, font, 'Avido', HEADER.debolezza);
-  drawText(page, font, 'Alto e magro', HEADER.aspetto1);
-  drawText(page, font, 'Cicatrice sul volto', HEADER.aspetto2);
-  drawText(page, font, 'Mantello verde', HEADER.aspetto3);
+  drawWrappedText(page, font, 'Avido: Voglio la parte più grande del bottino, anche se questo significa litigare con i miei compagni di viaggio.', HEADER.debolezza.x, HEADER.debolezza.y, { ...DEBOLEZZA_WRAP, size: HEADER.debolezza.size });
+
+  const aspettoVals = [
+    'Quantità anormali di peli del corpo (a seconda della stirpe)',
+    'Cicatrice sul volto',
+    'Mantello verde consumato dal tempo e dalle intemperie',
+  ];
+  aspettoVals.forEach((t, i) => drawWrappedText(page, font, t, ASPETTO[i].x, ASPETTO[i].y, ASPETTO[i]));
+
   drawText(page, fontBold, 'Aldric Silente', HEADER.nome);
 
   const attrVals = { FOR: 11, COS: 9, AGI: 16, INT: 12, VOL: 12, CAR: 15 };
   for (const [attr, x] of Object.entries(ATTRIBUTE_X)) {
     drawText(page, fontBold, attrVals[attr], { x, y: ATTRIBUTE_VALUE_Y, size: 11, align: 'center' });
   }
-
   const condAttrs = ['FOR','COS','AGI','INT','VOL','CAR'];
   [true, false, true, false, false, true].forEach((on, i) => {
     if (on) drawCheck(page, font, ATTRIBUTE_X[condAttrs[i]] + CONDITION_CHECK_DX, CONDITION_Y, 7);
@@ -127,7 +157,7 @@ function drawCheck(page, font, x, y, size = 8) {
   for (let i = 0; i < 10; i++) {
     drawText(page, font, `Oggetto ${i + 1}`, { x: INVENTORY.valueX, y: INVENTORY.yStart - i * INVENTORY.rowHeight, size: INVENTORY.size });
   }
-  drawText(page, font, 'Ciondolo di famiglia', { x: INVENTORY.cimelioX, y: INVENTORY.cimelioY, size: INVENTORY.size });
+  drawWrappedText(page, font, 'Una mappa disegnata a mano che hai ereditato da tua nonna, ormai sbiadita e strappata ai bordi', INVENTORY.cimelioX, INVENTORY.cimelioY, { ...INVENTORY.cimelioWrap, size: INVENTORY.size });
 
   drawText(page, font, 'Anello, moneta strana', RESOURCES.oggettiMinuscoli);
   drawText(page, font, '18 kg', RESOURCES.pesoTrasportabile);
@@ -135,15 +165,15 @@ function drawCheck(page, font, x, y, size = 8) {
   drawText(page, font, '30', RESOURCES.argento);
   drawText(page, font, '75', RESOURCES.rame);
 
-  drawText(page, font, 'Cuoio', ARMOR.armaturaNome);
-  drawText(page, fontBold, '3', ARMOR.armaturaValore);
-  drawText(page, font, 'Cappuccio', ARMOR.copricapoNome);
+  drawText(page, font, 'Cotta di Maglia', ARMOR.armaturaNome);
+  drawText(page, fontBold, '4', ARMOR.armaturaValore);
+  drawText(page, font, 'Celata', ARMOR.copricapoNome);
   drawText(page, fontBold, '1', ARMOR.copricapoValore);
 
   const armi = [
-    { nome: 'Spada corta', imp: '1', portata: 'Corta', danno: 'D8', durabilita: '8', qualita: 'Tagliente' },
-    { nome: 'Arco lungo', imp: '2', portata: '40/80/160', danno: 'D8', durabilita: '6', qualita: '' },
-    { nome: 'Coltello', imp: '-', portata: 'Corta', danno: 'D6', durabilita: '5', qualita: '' },
+    { nome: 'Spada Corta', imp: '1M', portata: '2', danno: 'D10', durabilita: '12', qualita: 'Perforante, tagliente' },
+    { nome: 'Arco Lungo', imp: '2M', portata: '100', danno: 'D12', durabilita: '6', qualita: 'Perforante, richiede faretra' },
+    { nome: 'Pugnale', imp: '1M', portata: 'FOR', danno: 'D8', durabilita: '9', qualita: 'Infido, perforante, tagliente, può essere lanciato' },
   ];
   armi.forEach((w, i) => {
     const y = WEAPONS_TABLE.yStart - i * WEAPONS_TABLE.rowHeight;
@@ -157,8 +187,8 @@ function drawCheck(page, font, x, y, size = 8) {
   });
 
   drawCheck(page, font, RIPOSO.roundDiRiposo.x, RIPOSO.roundDiRiposo.y, 7);
-  drawText(page, fontBold, '9 / 12', PV_PF.volontaLabel);
-  drawText(page, fontBold, '6 / 14', PV_PF.feritaLabel);
+  drawText(page, fontBold, '12', PV_PF.volontaMax);
+  drawText(page, fontBold, '9', PV_PF.feritaMax);
   for (let i = 0; i < 2; i++) drawCheck(page, font, TIRI_MORTE.successiX + i * 12, TIRI_MORTE.y, TIRI_MORTE.size);
   for (let i = 0; i < 1; i++) drawCheck(page, font, TIRI_MORTE.fallimentiX + i * 12, TIRI_MORTE.y, TIRI_MORTE.size);
 

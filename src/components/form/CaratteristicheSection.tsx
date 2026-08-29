@@ -3,7 +3,7 @@ import { useCharacter } from '../../state/CharacterContext';
 import { ATTRIBUTES, Condition } from '../../types/character';
 import { AttributeRoller } from '../dice/AttributeRoller';
 import { calcDannoBonus, calcMovimento } from '../../data/dragonbaneData';
-import { Checkbox, NumberField, SectionCard, TextField } from './fields';
+import { Checkbox, NumberField, SectionCard } from './fields';
 
 const CONDITIONS: Condition[] = ['ESAUSTO', 'MALATICCIO', 'DISORIENTATO', 'ARRABBIATO', 'SPAVENTATO', 'SCORAGGIATO'];
 
@@ -70,13 +70,43 @@ export function CaratteristicheSection() {
       </p>
       <div className="mt-2 grid grid-cols-3 gap-3">
         <div>
-          <TextField label="Danno Bonus FOR" value={character.dannoBonusFor} onChange={(v) => update('dannoBonusFor', v)} />
+          <label className="flex flex-col gap-1 text-xs text-parchment-200/80">
+            <span>Danno Bonus FOR</span>
+            <div className="flex gap-2">
+              <input type="text" className="flex-1" value={character.dannoBonusFor} onChange={(e) => update('dannoBonusFor', e.target.value)} />
+              {dannoBonusForCalc && character.dannoBonusFor !== dannoBonusForCalc && (
+                <button
+                  type="button"
+                  title={`Usa il valore da manuale: ${dannoBonusForCalc}`}
+                  onClick={() => update('dannoBonusFor', dannoBonusForCalc)}
+                  className="shrink-0 rounded border border-dragon-gold/40 px-2 py-1.5 text-sm hover:bg-dragon-gold/10"
+                >
+                  🎲
+                </button>
+              )}
+            </div>
+          </label>
           {dannoBonusForCalc && character.dannoBonusFor !== dannoBonusForCalc && (
             <p className="mt-0.5 text-[10px] text-parchment-200/45">da manuale: {dannoBonusForCalc}</p>
           )}
         </div>
         <div>
-          <TextField label="Danno Bonus AGI" value={character.dannoBonusAgi} onChange={(v) => update('dannoBonusAgi', v)} />
+          <label className="flex flex-col gap-1 text-xs text-parchment-200/80">
+            <span>Danno Bonus AGI</span>
+            <div className="flex gap-2">
+              <input type="text" className="flex-1" value={character.dannoBonusAgi} onChange={(e) => update('dannoBonusAgi', e.target.value)} />
+              {dannoBonusAgiCalc && character.dannoBonusAgi !== dannoBonusAgiCalc && (
+                <button
+                  type="button"
+                  title={`Usa il valore da manuale: ${dannoBonusAgiCalc}`}
+                  onClick={() => update('dannoBonusAgi', dannoBonusAgiCalc)}
+                  className="shrink-0 rounded border border-dragon-gold/40 px-2 py-1.5 text-sm hover:bg-dragon-gold/10"
+                >
+                  🎲
+                </button>
+              )}
+            </div>
+          </label>
           {dannoBonusAgiCalc && character.dannoBonusAgi !== dannoBonusAgiCalc && (
             <p className="mt-0.5 text-[10px] text-parchment-200/45">da manuale: {dannoBonusAgiCalc}</p>
           )}

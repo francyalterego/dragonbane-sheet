@@ -1,28 +1,16 @@
 import { useCharacter } from '../../state/CharacterContext';
-import { ARMATURE, ARMI, ArmorStats, COPRICAPI, WeaponStats } from '../../data/equipmentTables';
+import { applyArmor, applyHelmet, ARMATURE, ARMI, COPRICAPI, WeaponStats } from '../../data/equipmentTables';
 import { WeaponRow } from '../../types/character';
-import { Checkbox, NumberField, SectionCard, TextField } from './fields';
+import { NumberField, SectionCard, TextField } from './fields';
+
+function sciagureList(flags: Record<string, boolean>, labels: Record<string, string>): string {
+  return Object.entries(flags)
+    .filter(([, v]) => v)
+    .map(([k]) => labels[k])
+    .join(', ');
+}
 
 const PERSONALIZZATO = 'Personalizzato';
-
-function applyArmor(stats: ArmorStats) {
-  return {
-    nome: stats.nome,
-    valore: stats.valore,
-    sciaguraSgattaiolare: stats.sciagure.includes('Sgattaiolare'),
-    sciaguraSfuggire: stats.sciagure.includes('Sfuggire'),
-    sciaguraAcrobazia: stats.sciagure.includes('Acrobazia'),
-  };
-}
-
-function applyHelmet(stats: ArmorStats) {
-  return {
-    nome: stats.nome,
-    valore: stats.valore,
-    sciaguraConsapevolezza: stats.sciagure.includes('Consapevolezza'),
-    sciaguraAttacchiADistanza: stats.sciagure.includes('Attacchi a Distanza'),
-  };
-}
 
 function applyWeapon(stats: WeaponStats): WeaponRow {
   return { nome: stats.nome, imp: stats.imp, portata: stats.portata, danno: stats.danno, durabilita: stats.durabilita, qualita: stats.qualita };
@@ -76,23 +64,20 @@ export function CombattimentoSection() {
           {armaturaIsCustom && (
             <TextField value={character.armatura.nome} onChange={(v) => update('armatura', { ...character.armatura, nome: v })} placeholder="Nome armatura" />
           )}
-          <div className="flex gap-3">
-            <Checkbox
-              label="Sciagura: Sgattaiolare"
-              checked={character.armatura.sciaguraSgattaiolare}
-              onChange={(v) => update('armatura', { ...character.armatura, sciaguraSgattaiolare: v })}
-            />
-            <Checkbox
-              label="Sciagura: Sfuggire"
-              checked={character.armatura.sciaguraSfuggire}
-              onChange={(v) => update('armatura', { ...character.armatura, sciaguraSfuggire: v })}
-            />
-          </div>
-          <Checkbox
-            label="Sciagura: Acrobazia"
-            checked={character.armatura.sciaguraAcrobazia}
-            onChange={(v) => update('armatura', { ...character.armatura, sciaguraAcrobazia: v })}
-          />
+          {(character.armatura.sciaguraSgattaiolare || character.armatura.sciaguraSfuggire || character.armatura.sciaguraAcrobazia) && (
+            <p className="text-[11px] text-parchment-200/50">
+              Sciagura su:{' '}
+              {sciagureList(
+                {
+                  sciaguraSgattaiolare: character.armatura.sciaguraSgattaiolare,
+                  sciaguraSfuggire: character.armatura.sciaguraSfuggire,
+                  sciaguraAcrobazia: character.armatura.sciaguraAcrobazia,
+                },
+                { sciaguraSgattaiolare: 'Sgattaiolare', sciaguraSfuggire: 'Sfuggire', sciaguraAcrobazia: 'Acrobazia' }
+              )}{' '}
+              (automatico dall'armatura scelta)
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -130,16 +115,19 @@ export function CombattimentoSection() {
           {copricapoIsCustom && (
             <TextField value={character.copricapo.nome} onChange={(v) => update('copricapo', { ...character.copricapo, nome: v })} placeholder="Nome copricapo" />
           )}
-          <Checkbox
-            label="Sciagura: Consapevolezza"
-            checked={character.copricapo.sciaguraConsapevolezza}
-            onChange={(v) => update('copricapo', { ...character.copricapo, sciaguraConsapevolezza: v })}
-          />
-          <Checkbox
-            label="Sciagura: Attacchi a Distanza"
-            checked={character.copricapo.sciaguraAttacchiADistanza}
-            onChange={(v) => update('copricapo', { ...character.copricapo, sciaguraAttacchiADistanza: v })}
-          />
+          {(character.copricapo.sciaguraConsapevolezza || character.copricapo.sciaguraAttacchiADistanza) && (
+            <p className="text-[11px] text-parchment-200/50">
+              Sciagura su:{' '}
+              {sciagureList(
+                {
+                  sciaguraConsapevolezza: character.copricapo.sciaguraConsapevolezza,
+                  sciaguraAttacchiADistanza: character.copricapo.sciaguraAttacchiADistanza,
+                },
+                { sciaguraConsapevolezza: 'Consapevolezza', sciaguraAttacchiADistanza: 'Attacchi a Distanza' }
+              )}{' '}
+              (automatico dal copricapo scelto)
+            </p>
+          )}
         </div>
       </div>
 

@@ -14,12 +14,14 @@ export interface Skill {
   name: string;
   attribute: Attribute;
   value: number | '';
+  allenata: boolean;
 }
 
 export interface WeaponSkill {
   name: string;
   attribute: Attribute;
   value: number | '';
+  allenata: boolean;
 }
 
 export interface SecondarySkill {
@@ -147,8 +149,8 @@ export function createEmptyCharacter(): Character {
     dannoBonusAgi: '',
     movimento: '',
     capacitaIncantesimi: Array(8).fill(''),
-    skills: SKILL_DEFS.map((s) => ({ ...s, value: '' })),
-    weaponSkills: WEAPON_SKILL_DEFS.map((s) => ({ ...s, value: '' })),
+    skills: SKILL_DEFS.map((s) => ({ ...s, value: '', allenata: false })),
+    weaponSkills: WEAPON_SKILL_DEFS.map((s) => ({ ...s, value: '', allenata: false })),
     secondarySkills: Array(5)
       .fill(null)
       .map(() => ({ name: '', attribute: '', value: '' })),

@@ -2,15 +2,48 @@
 import { useState } from 'react';
 import { useCharacter } from '../../state/CharacterContext';
 import { CIMELI, PROFESSIONI_INFO } from '../../data/dragonbaneData';
+import { applyArmor, applyHelmet, ARMATURE, COPRICAPI } from '../../data/equipmentTables';
+import { parseEquipmentSet } from '../../data/equipmentParser';
+import { WeaponRow } from '../../types/character';
 import { NumberField, SectionCard, TextField } from './fields';
 
 const ALTRO = 'Altro';
 
 export function InventarioSection() {
-  const { character, update } = useCharacter();
+  const { character, update, setCharacter } = useCharacter();
   const cimelioIsCustom = character.cimelio !== '' && !CIMELI.includes(character.cimelio);
   const prof = PROFESSIONI_INFO.find((p) => p.nome === character.professione);
   const [equipSet, setEquipSet] = useState<number | null>(null);
+  const [equipNotes, setEquipNotes] = useState<string[]>([]);
+
+  function applyEquipmentSet(i: number) {
+    if (!prof) return;
+    setEquipSet(i);
+    const parsed = parseEquipmentSet(prof.attrezzatura[i].testo);
+    setEquipNotes(parsed.note);
+
+    const armi: WeaponRow[] = Array(3)
+      .fill(null)
+      .map((_, idx) => parsed.armi[idx] ?? { nome: '', imp: '', portata: '', danno: '', durabilita: '', qualita: '' });
+    const inventario = Array(10)
+      .fill(null)
+      .map((_, idx) => ({ text: parsed.inventario[idx] ?? '' }));
+
+    setCharacter((prev) => ({
+      ...prev,
+      armi,
+      inventario,
+      armatura: parsed.armatura
+        ? { ...prev.armatura, ...applyArmor(ARMATURE.find((a) => a.nome === parsed.armatura!.nome)!) }
+        : prev.armatura,
+      copricapo: parsed.copricapo
+        ? { ...prev.copricapo, ...applyHelmet(COPRICAPI.find((a) => a.nome === parsed.copricapo!.nome)!) }
+        : prev.copricapo,
+      oro: prev.oro === '' ? parsed.oro : (prev.oro as number) + parsed.oro,
+      argento: prev.argento === '' ? parsed.argento : (prev.argento as number) + parsed.argento,
+      rame: prev.rame === '' ? parsed.rame : (prev.rame as number) + parsed.rame,
+    }));
+  }
 
   return (
     <SectionCard title="Inventario">
@@ -24,7 +57,7 @@ export function InventarioSection() {
               type="button"
               onClick={() => {
                 const roll = 1 + Math.floor(Math.random() * 6);
-                setEquipSet(roll <= 2 ? 0 : roll <= 4 ? 1 : 2);
+                applyEquipmentSet(roll <= 2 ? 0 : roll <= 4 ? 1 : 2);
               }}
               className="shrink-0 rounded border border-dragon-gold/40 px-2 py-0.5 text-[10px] hover:bg-dragon-gold/10"
             >
@@ -36,7 +69,7 @@ export function InventarioSection() {
               <button
                 key={set.tiro}
                 type="button"
-                onClick={() => setEquipSet(i)}
+                onClick={() => applyEquipmentSet(i)}
                 className={[
                   'rounded border p-1.5 text-left text-[11px] leading-snug',
                   equipSet === i ? 'border-dragon-gold bg-dragon-gold/10 text-parchment-50' : 'border-dragon-gold/15 text-parchment-200/60 hover:border-dragon-gold/30',
@@ -48,9 +81,16 @@ export function InventarioSection() {
             ))}
           </div>
           <p className="mt-1.5 text-[10px] text-parchment-200/45">
-            Trascrivi armi e armatura scelte in Combattimento (dove trovi anche i loro valori esatti), il resto qui
-            sotto o negli Oggetti Minuscoli. Possiedi anche indumenti semplici, non serve segnarli.
+            Selezionando un set, armi, armatura/copricapo, inventario e monete si compilano da soli (sostituendo
+            quanto già presente in queste sezioni). Le monete si sommano a quelle che avevi già.
           </p>
+          {equipNotes.length > 0 && (
+            <ul className="mt-1.5 list-inside list-disc text-[10px] text-parchment-200/60">
+              {equipNotes.map((n, i) => (
+                <li key={i}>{n}</li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

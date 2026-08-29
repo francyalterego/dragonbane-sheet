@@ -1,8 +1,49 @@
 import { useEffect } from 'react';
 import { useCharacter } from '../../state/CharacterContext';
-import { ATTRIBUTES, Attribute } from '../../types/character';
-import { calcValoreBase, PROFESSIONI_INFO } from '../../data/dragonbaneData';
+import { ATTRIBUTES, Attribute, Skill, WeaponSkill } from '../../types/character';
+import { AGE_TRAINED_SKILLS, calcValoreBase, EtaCategoria, PROFESSIONI_INFO } from '../../data/dragonbaneData';
 import { SectionCard, TextField } from './fields';
+
+const PROFESSION_CAP = 6;
+
+function SkillRow({
+  s,
+  base,
+  trainable,
+  disabled,
+  onValueChange,
+  onToggleAllenata,
+}: {
+  s: Skill | WeaponSkill;
+  base: number | '';
+  trainable: boolean;
+  disabled: boolean;
+  onValueChange: (v: number | '') => void;
+  onToggleAllenata: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <input
+        type="checkbox"
+        checked={s.allenata}
+        disabled={disabled}
+        onChange={onToggleAllenata}
+        title={disabled ? 'Limite di abilità allenate raggiunto' : 'Allenata: raddoppia il valore base'}
+        className="accent-dragon-gold disabled:opacity-30"
+      />
+      <span className={`w-36 truncate text-xs ${trainable ? 'text-dragon-gold' : ''}`}>
+        {s.name} <span className="text-parchment-200/50">({s.attribute})</span>
+      </span>
+      <input
+        type="number"
+        className="w-16"
+        value={s.value}
+        onChange={(e) => onValueChange(e.target.value === '' ? '' : Number(e.target.value))}
+      />
+      {base !== '' && <span className="text-[10px] text-parchment-200/40">base {base}{trainable ? `/${base * 2}` : ''}</span>}
+    </div>
+  );
+}
 
 export function AbilitaSection() {
   const { character, update } = useCharacter();
@@ -28,68 +69,79 @@ export function AbilitaSection() {
     if (JSON.stringify(ws) !== JSON.stringify(character.weaponSkills)) update('weaponSkills', ws);
   }, [character.attributes]);
 
+  const allRows = [...character.skills, ...character.weaponSkills];
+  const professionTrainedCount = allRows.filter((s) => s.allenata && trainableNames.has(s.name)).length;
+  const freeTrainedCount = allRows.filter((s) => s.allenata && !trainableNames.has(s.name)).length;
+  const freeCap = character.eta ? AGE_TRAINED_SKILLS[character.eta as EtaCategoria] - PROFESSION_CAP : null;
+
+  function toggle<T extends Skill | WeaponSkill>(list: T[], i: number, key: 'skills' | 'weaponSkills') {
+    const s = list[i];
+    const base = calcValoreBase(character.attributes[s.attribute]);
+    const nextAllenata = !s.allenata;
+    const nextValue = base === '' ? s.value : nextAllenata ? (base as number) * 2 : base;
+    const next = [...list];
+    next[i] = { ...s, allenata: nextAllenata, value: nextValue };
+    update(key, next as any);
+  }
+
+  function isDisabled(s: Skill | WeaponSkill) {
+    if (s.allenata) return false; // si può sempre togliere la spunta
+    if (trainableNames.has(s.name)) return professionTrainedCount >= PROFESSION_CAP;
+    return freeCap !== null && freeTrainedCount >= freeCap;
+  }
+
   return (
     <SectionCard title="Abilità">
-      <p className="mb-3 text-[11px] text-parchment-200/50">
-        Pag. 27: il valore base (in grigio) è automatico dal tuo attributo. Le abilità evidenziate in oro sono quelle
-        della professione {character.professione || '(selezionala in Anagrafica)'}: {character.professione && 'scegline 6 come '}
-        <span className="text-dragon-gold">allenate</span> — il loro valore iniziale è il <em>doppio</em> del base. In
-        base all'età hai poi altre 2 (Giovane), 4 (Adulto) o 6 (Vecchio) abilità allenate a scelta libera tra tutte.
+      <p className="mb-1.5 text-[11px] text-parchment-200/50">
+        Pag. 27: il valore base (in grigio) è automatico dal tuo attributo. Le abilità in oro sono quelle della
+        professione {character.professione || '(selezionala in Anagrafica)'}: spunta <span className="text-dragon-gold">Allenata</span> per
+        raddoppiare il valore base. Ne scegli 6 dalla professione, più altre a scelta libera in base all'età: 2
+        (Giovane), 4 (Adulto) o 6 (Vecchio).
+      </p>
+      <p className="mb-3 text-[11px] text-parchment-200/70">
+        Allenate dalla professione: {professionTrainedCount}/{PROFESSION_CAP} · Allenate libere:{' '}
+        {freeTrainedCount}/{freeCap ?? '?'} {!character.eta && '(scegli l\'età in Anagrafica per il limite)'}
       </p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <p className="mb-1.5 text-xs uppercase tracking-wide text-parchment-200/60">Abilità generali</p>
           <div className="flex flex-col gap-1.5">
-            {character.skills.map((s, i) => {
-              const base = calcValoreBase(character.attributes[s.attribute]);
-              const trainable = trainableNames.has(s.name);
-              return (
-                <div key={s.name} className="flex items-center gap-2">
-                  <span className={`w-40 truncate text-xs ${trainable ? 'text-dragon-gold' : ''}`}>
-                    {s.name} <span className="text-parchment-200/50">({s.attribute})</span>
-                  </span>
-                  <input
-                    type="number"
-                    className="w-16"
-                    value={s.value}
-                    onChange={(e) => {
-                      const skills = [...character.skills];
-                      skills[i] = { ...s, value: e.target.value === '' ? '' : Number(e.target.value) };
-                      update('skills', skills);
-                    }}
-                  />
-                  {base !== '' && <span className="text-[10px] text-parchment-200/40">base {base}{trainable ? `/${base * 2}` : ''}</span>}
-                </div>
-              );
-            })}
+            {character.skills.map((s, i) => (
+              <SkillRow
+                key={s.name}
+                s={s}
+                base={calcValoreBase(character.attributes[s.attribute])}
+                trainable={trainableNames.has(s.name)}
+                disabled={isDisabled(s)}
+                onValueChange={(v) => {
+                  const skills = [...character.skills];
+                  skills[i] = { ...s, value: v };
+                  update('skills', skills);
+                }}
+                onToggleAllenata={() => toggle(character.skills, i, 'skills')}
+              />
+            ))}
           </div>
         </div>
 
         <div>
           <p className="mb-1.5 text-xs uppercase tracking-wide text-parchment-200/60">Abilità con armi</p>
           <div className="flex flex-col gap-1.5">
-            {character.weaponSkills.map((s, i) => {
-              const base = calcValoreBase(character.attributes[s.attribute]);
-              const trainable = trainableNames.has(s.name);
-              return (
-                <div key={s.name} className="flex items-center gap-2">
-                  <span className={`w-40 truncate text-xs ${trainable ? 'text-dragon-gold' : ''}`}>
-                    {s.name} <span className="text-parchment-200/50">({s.attribute})</span>
-                  </span>
-                  <input
-                    type="number"
-                    className="w-16"
-                    value={s.value}
-                    onChange={(e) => {
-                      const ws = [...character.weaponSkills];
-                      ws[i] = { ...s, value: e.target.value === '' ? '' : Number(e.target.value) };
-                      update('weaponSkills', ws);
-                    }}
-                  />
-                  {base !== '' && <span className="text-[10px] text-parchment-200/40">base {base}{trainable ? `/${base * 2}` : ''}</span>}
-                </div>
-              );
-            })}
+            {character.weaponSkills.map((s, i) => (
+              <SkillRow
+                key={s.name}
+                s={s}
+                base={calcValoreBase(character.attributes[s.attribute])}
+                trainable={trainableNames.has(s.name)}
+                disabled={isDisabled(s)}
+                onValueChange={(v) => {
+                  const ws = [...character.weaponSkills];
+                  ws[i] = { ...s, value: v };
+                  update('weaponSkills', ws);
+                }}
+                onToggleAllenata={() => toggle(character.weaponSkills, i, 'weaponSkills')}
+              />
+            ))}
           </div>
 
           <p className="mb-1.5 mt-4 text-xs uppercase tracking-wide text-parchment-200/60">Abilità secondarie</p>

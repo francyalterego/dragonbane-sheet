@@ -17,12 +17,27 @@ export const HEADER: Record<string, FieldPos> = {
   stirpe: { x: 70, y: 744, size: 8 },
   eta: { x: 168, y: 744, size: 8 },
   professione: { x: 112, y: 727, size: 8 },
-  debolezza: { x: 112, y: 709, size: 8 },
-  aspetto1: { x: 462, y: 761, size: 7 },
-  aspetto2: { x: 413, y: 744, size: 7 },
-  aspetto3: { x: 413, y: 727, size: 7 },
-  nome: { x: 306, y: 665, size: 13, align: 'center' },
+  debolezza: { x: 112, y: 709, size: 6.5 },
+  nome: { x: 306, y: 671, size: 13, align: 'center' },
 };
+
+// Debolezza/Cimelio/Aspetto vanno a capo se lunghi (vedi drawWrappedText in fillPdf.ts).
+// Le posizioni di partenza restano quelle delle righe stampate; con lineHeight stretto le
+// eventuali righe aggiuntive restano comunque nello spazio libero prima della riga successiva.
+export const DEBOLEZZA_WRAP = { maxWidth: 290, lineHeight: 8, maxLines: 3 };
+
+export interface WrapPos extends Omit<FieldPos, 'size'> {
+  size: number;
+  maxWidth: number;
+  lineHeight: number;
+  maxLines: number;
+}
+
+export const ASPETTO: WrapPos[] = [
+  { x: 462, y: 761, size: 6.5, maxWidth: 140, lineHeight: 7.5, maxLines: 2 },
+  { x: 413, y: 744, size: 6.5, maxWidth: 190, lineHeight: 7.5, maxLines: 2 },
+  { x: 413, y: 727, size: 6.5, maxWidth: 190, lineHeight: 7.5, maxLines: 2 },
+];
 
 // Centri dei cerchi misurati per analisi pixel (fanno parte dell'immagine di sfondo,
 // non sono oggetti vettoriali: la posizione delle etichette testuali non basta a dedurli).
@@ -84,6 +99,7 @@ export const INVENTORY = {
   size: 7.5,
   cimelioY: 340,
   cimelioX: 452,
+  cimelioWrap: { maxWidth: 148, lineHeight: 8.5, maxLines: 3 },
 };
 
 export const RESOURCES: Record<string, FieldPos> = {
@@ -110,7 +126,7 @@ export const WEAPONS_TABLE = {
   qualitaX: 309.34,
   yStart: 78,
   rowHeight: 14.5,
-  size: 7,
+  size: 6.5,
 };
 
 export const RIPOSO: Record<string, FieldPos> = {
@@ -118,9 +134,11 @@ export const RIPOSO: Record<string, FieldPos> = {
   intervalloDiRiposo: { x: 487, y: 185.5, size: 8 },
 };
 
+// Solo il massimo va scritto qui (in nero, nello spazio bianco sotto l'etichetta):
+// i pallini di PV/PF attuali li spunta a matita il giocatore durante il gioco.
 export const PV_PF = {
-  volontaLabel: { x: 500, y: 163.07, size: 9, align: 'center' } as FieldPos,
-  feritaLabel: { x: 500, y: 96.87, size: 9, align: 'center' } as FieldPos,
+  volontaMax: { x: 421, y: 150, size: 10, align: 'left' } as FieldPos,
+  feritaMax: { x: 421, y: 83.5, size: 10, align: 'left' } as FieldPos,
 };
 
 export const TIRI_MORTE = {

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useCharacter } from '../../state/CharacterContext';
-import { Checkbox, NumberField, SectionCard } from './fields';
+import { NumberField, SectionCard } from './fields';
 
 export function RisorseSection() {
   const { character, update } = useCharacter();
@@ -26,10 +26,12 @@ export function RisorseSection() {
   }, [character.puntiFeritaMax]);
 
   return (
-    <SectionCard title="Punti Ferita, Volontà e Riposo">
+    <SectionCard title="Punti Ferita e Volontà">
       <p className="mb-2 text-[11px] text-parchment-200/50">
         Pag. 27: i Punti Volontà massimi equivalgono a VOL, i Punti Ferita massimi a COS (si compilano da soli finché
         non li tocchi tu, ad es. per le capacità eroiche Concentrato o Robusto, che li aumentano permanentemente).
+        Sulla scheda scriviamo solo il massimo: i pallini di quelli attuali li spunti tu a matita mentre giochi, come
+        i tiri morte e i round/intervalli di riposo — non servono in fase di creazione.
       </p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
@@ -46,44 +48,6 @@ export function RisorseSection() {
             <NumberField label="Massimo" value={character.puntiFeritaMax} onChange={(v) => update('puntiFeritaMax', v)} />
           </div>
         </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center gap-4">
-        <div>
-          <p className="mb-1 text-xs uppercase tracking-wide text-parchment-200/60">Tiri Morte — Successi</p>
-          <div className="flex gap-2">
-            {[0, 1, 2].map((i) => (
-              <Checkbox
-                key={i}
-                label={`${i + 1}`}
-                checked={character.tiriMorteSuccessi > i}
-                onChange={() => update('tiriMorteSuccessi', character.tiriMorteSuccessi > i ? i : i + 1)}
-              />
-            ))}
-          </div>
-        </div>
-        <div>
-          <p className="mb-1 text-xs uppercase tracking-wide text-parchment-200/60">Tiri Morte — Fallimenti</p>
-          <div className="flex gap-2">
-            {[0, 1, 2].map((i) => (
-              <Checkbox
-                key={i}
-                label={`${i + 1}`}
-                checked={character.tiriMorteFallimenti > i}
-                onChange={() => update('tiriMorteFallimenti', character.tiriMorteFallimenti > i ? i : i + 1)}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 flex gap-4">
-        <Checkbox label="Round di Riposo" checked={character.roundDiRiposo} onChange={(v) => update('roundDiRiposo', v)} />
-        <Checkbox
-          label="Intervallo di Riposo"
-          checked={character.intervalloDiRiposo}
-          onChange={(v) => update('intervalloDiRiposo', v)}
-        />
       </div>
     </SectionCard>
   );
