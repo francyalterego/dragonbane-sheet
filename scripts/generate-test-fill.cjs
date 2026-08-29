@@ -42,7 +42,7 @@ const RESOURCES = {
   argento: { x: 90, y: 244.91, size: 7.5 },
   rame: { x: 90, y: 215.12, size: 7.5 },
   oggettiMinuscoli: { x: 462, y: 265, size: 7 },
-  pesoTrasportabile: { x: 600, y: 536.13, size: 6.5, align: 'right' },
+  pesoTrasportabile: { x: 541, y: 519, size: 8, align: 'center' },
 };
 const ARMOR = {
   armaturaNome: { x: 100, y: 165, size: 7 },
@@ -166,7 +166,7 @@ function drawWrappedText(page, font, text, x, y, opts) {
   drawWrappedText(page, font, 'Una mappa disegnata a mano che hai ereditato da tua nonna, ormai sbiadita e strappata ai bordi', INVENTORY.cimelioX, INVENTORY.cimelioY, { ...INVENTORY.cimelioWrap, size: INVENTORY.size });
 
   drawText(page, font, 'Anello, moneta strana', RESOURCES.oggettiMinuscoli);
-  drawText(page, font, '18 kg', RESOURCES.pesoTrasportabile);
+  drawText(page, fontBold, '6', RESOURCES.pesoTrasportabile);
   drawText(page, font, '12', RESOURCES.oro);
   drawText(page, font, '30', RESOURCES.argento);
   drawText(page, font, '75', RESOURCES.rame);

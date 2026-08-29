@@ -109,7 +109,9 @@ export const RESOURCES: Record<string, FieldPos> = {
   argento: { x: 90, y: 244.91, size: 7.5 },
   rame: { x: 90, y: 215.12, size: 7.5 },
   oggettiMinuscoli: { x: 462, y: 265, size: 7 },
-  pesoTrasportabile: { x: 600, y: 536.13, size: 6.5, align: 'right' },
+  // finestrella color pergamena dentro il nastro INVENTARIO stesso (misurata: x 525-558),
+  // non testo libero accanto all'etichetta come prima.
+  pesoTrasportabile: { x: 541, y: 519, size: 8, align: 'center' },
 };
 
 export const ARMOR: Record<string, FieldPos> = {

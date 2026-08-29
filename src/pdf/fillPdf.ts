@@ -173,7 +173,7 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
   });
 
   drawText(page, font, character.oggettiMinuscoli, F.RESOURCES.oggettiMinuscoli);
-  drawText(page, font, character.pesoTrasportabile, F.RESOURCES.pesoTrasportabile);
+  drawText(page, fontBold, character.pesoTrasportabile, F.RESOURCES.pesoTrasportabile);
   if (character.oro !== '') drawText(page, font, String(character.oro), F.RESOURCES.oro);
   if (character.argento !== '') drawText(page, font, String(character.argento), F.RESOURCES.argento);
   if (character.rame !== '') drawText(page, font, String(character.rame), F.RESOURCES.rame);
