@@ -63,7 +63,7 @@ export const DANNO_MOVIMENTO: Record<string, FieldPos> = {
 };
 
 export const CAPACITA_INCANTESIMI = {
-  x: 22,
+  x: 36, // misurato: la riga stampata inizia a x=34-35, non a x=22
   yStart: 499,
   rowHeight: 14,
   size: 7,
