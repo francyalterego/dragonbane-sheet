@@ -119,11 +119,11 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
     }
   });
 
-  // Nastro verde scuro: serve inchiostro chiaro
-  drawText(page, fontBold, character.dannoBonusFor, F.DANNO_MOVIMENTO.dannoBonusFor, 8, INK_LIGHT);
-  drawText(page, fontBold, character.dannoBonusAgi, F.DANNO_MOVIMENTO.dannoBonusAgi, 8, INK_LIGHT);
+  // x/y cadono nella "finestrella" chiara del nastro (vedi fieldMap): inchiostro normale
+  drawText(page, fontBold, character.dannoBonusFor, F.DANNO_MOVIMENTO.dannoBonusFor);
+  drawText(page, fontBold, character.dannoBonusAgi, F.DANNO_MOVIMENTO.dannoBonusAgi);
   if (character.movimento !== '')
-    drawText(page, fontBold, String(character.movimento), F.DANNO_MOVIMENTO.movimento, 8, INK_LIGHT);
+    drawText(page, fontBold, String(character.movimento), F.DANNO_MOVIMENTO.movimento);
 
   character.capacitaIncantesimi.forEach((text, i) => {
     if (!text) return;

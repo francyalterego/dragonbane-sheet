@@ -27,12 +27,12 @@ const CONDITION_Y = 592.45;
 const CONDITION_CHECK_DX = -29;
 
 const DANNO_MOVIMENTO = {
-  dannoBonusFor: { x: 148, y: 554.38, size: 8 },
-  dannoBonusAgi: { x: 335, y: 554.38, size: 8 },
-  movimento: { x: 520, y: 554.38, size: 8, align: 'center' },
+  dannoBonusFor: { x: 167.5, y: 554.38, size: 9, align: 'center' },
+  dannoBonusAgi: { x: 355, y: 554.38, size: 9, align: 'center' },
+  movimento: { x: 542, y: 554.38, size: 9, align: 'center' },
 };
 
-const CAPACITA = { x: 22, yStart: 507, rowHeight: 12.6, size: 7 };
+const CAPACITA = { x: 22, yStart: 499, rowHeight: 14, size: 7 };
 const SKILLS = { nameX: 221.24, valueX: 200, yStart: 496.05, rowHeight: 14.175, size: 8 };
 const WEAPON_SKILLS = { nameX: 348.01, valueX: 325, yStart: 481.87, rowHeight: 14.175, size: 8 };
 const SECONDARY_SKILLS = { nameX: 348.01, valueX: 325, yStart: 311.79, rowHeight: 14.175, size: 7.5 };
@@ -51,16 +51,16 @@ const ARMOR = {
   copricapoValore: { x: 232, y: 165, size: 9, align: 'center' },
 };
 const WEAPONS_TABLE = {
-  nomeX: 55.64, impX: 142.52, portataX: 172.49, dannoX: 220.51, durabX: 265.02, qualitaX: 309.34,
-  yStart: 78, rowHeight: 14.5, size: 6.5,
+  nomeX: 55.64, impX: 142.52, portataX: 172.49, dannoX: 220.51, durabX: 265.02, qualitaX: 309.34, qualitaMaxWidth: 85,
+  yStart: 70, rowHeight: 17, size: 6.5,
 };
 const RIPOSO = {
   roundDiRiposo: { x: 405, y: 185.5 },
   intervalloDiRiposo: { x: 487, y: 185.5 },
 };
 const PV_PF = {
-  volontaMax: { x: 421, y: 150, size: 10, align: 'left' },
-  feritaMax: { x: 421, y: 83.5, size: 10, align: 'left' },
+  volontaMax: { x: 436, y: 141, size: 10, align: 'center' },
+  feritaMax: { x: 436, y: 74, size: 10, align: 'center' },
 };
 const TIRI_MORTE = { successiX: 490, fallimentiX: 536, y: 38, size: 9 };
 
@@ -75,6 +75,12 @@ function drawText(page, font, text, pos, fallbackSize = 8) {
   if (pos.align === 'center') x = pos.x - font.widthOfTextAtSize(text, size) / 2;
   else if (pos.align === 'right') x = pos.x - font.widthOfTextAtSize(text, size);
   page.drawText(text, { x, y: pos.y, size, font, color: INK });
+}
+function truncateToWidth(font, text, size, maxWidth) {
+  if (font.widthOfTextAtSize(text, size) <= maxWidth) return text;
+  let end = text.length;
+  while (end > 0 && font.widthOfTextAtSize(text.slice(0, end) + '…', size) > maxWidth) end--;
+  return text.slice(0, end) + '…';
 }
 function drawCheck(page, font, x, y, size = 8) {
   page.drawText('X', { x, y, size, font, color: INK });
@@ -134,24 +140,24 @@ function drawWrappedText(page, font, text, x, y, opts) {
     if (on) drawCheck(page, font, ATTRIBUTE_X[condAttrs[i]] + CONDITION_CHECK_DX, CONDITION_Y, 7);
   });
 
-  drawText(page, font, '+D4', DANNO_MOVIMENTO.dannoBonusFor);
-  drawText(page, font, '+D2', DANNO_MOVIMENTO.dannoBonusAgi);
-  drawText(page, font, '10', DANNO_MOVIMENTO.movimento);
+  drawText(page, fontBold, '+D4', DANNO_MOVIMENTO.dannoBonusFor);
+  drawText(page, fontBold, '+D2', DANNO_MOVIMENTO.dannoBonusAgi);
+  drawText(page, fontBold, '10', DANNO_MOVIMENTO.movimento);
 
   ['Vista nel Buio', 'Fiuto Animale', 'Passo Silenzioso'].forEach((t, i) => {
     drawText(page, font, t, { x: CAPACITA.x, y: CAPACITA.yStart - i * CAPACITA.rowHeight, size: CAPACITA.size });
   });
 
   SKILL_NAMES.forEach((_, i) => {
-    drawText(page, fontBold, 5 + i, { x: SKILLS.valueX, y: SKILLS.yStart - i * SKILLS.rowHeight, size: SKILLS.size });
+    drawText(page, fontBold, 5 + i, { x: SKILLS.valueX, y: SKILLS.yStart - i * SKILLS.rowHeight + 1, size: SKILLS.size });
   });
   WEAPON_SKILL_NAMES.forEach((_, i) => {
-    drawText(page, fontBold, 3 + i, { x: WEAPON_SKILLS.valueX, y: WEAPON_SKILLS.yStart - i * WEAPON_SKILLS.rowHeight, size: WEAPON_SKILLS.size });
+    drawText(page, fontBold, 3 + i, { x: WEAPON_SKILLS.valueX, y: WEAPON_SKILLS.yStart - i * WEAPON_SKILLS.rowHeight + 1, size: WEAPON_SKILLS.size });
   });
   ['Pesca', 'Cucina', 'Intaglio', 'Storia Locale', 'Erboristeria'].forEach((name, i) => {
     const y = SECONDARY_SKILLS.yStart - i * SECONDARY_SKILLS.rowHeight;
     drawText(page, font, name, { x: SECONDARY_SKILLS.nameX, y, size: SECONDARY_SKILLS.size });
-    drawText(page, fontBold, 2 + i, { x: SECONDARY_SKILLS.valueX, y, size: SECONDARY_SKILLS.size });
+    drawText(page, fontBold, 2 + i, { x: SECONDARY_SKILLS.valueX, y: y + 1, size: SECONDARY_SKILLS.size });
   });
 
   for (let i = 0; i < 10; i++) {
@@ -183,7 +189,8 @@ function drawWrappedText(page, font, text, x, y, opts) {
     drawText(page, font, w.portata, { x: WEAPONS_TABLE.portataX, y, size: s });
     drawText(page, font, w.danno, { x: WEAPONS_TABLE.dannoX, y, size: s });
     drawText(page, font, w.durabilita, { x: WEAPONS_TABLE.durabX, y, size: s });
-    drawText(page, font, w.qualita, { x: WEAPONS_TABLE.qualitaX, y, size: s });
+    const short = truncateToWidth(font, w.qualita, s, WEAPONS_TABLE.qualitaMaxWidth);
+    drawText(page, font, short, { x: WEAPONS_TABLE.qualitaX, y, size: s });
   });
 
   drawCheck(page, font, RIPOSO.roundDiRiposo.x, RIPOSO.roundDiRiposo.y, 7);

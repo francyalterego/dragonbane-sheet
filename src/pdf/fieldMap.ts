@@ -54,16 +54,18 @@ export const ATTRIBUTE_VALUE_Y = 626;
 export const CONDITION_Y = 592.45;
 export const CONDITION_CHECK_DX = -29; // offset checkbox rispetto al centro del cerchio attributo
 
+// x/y misurati individuando la "finestrella" chiara dentro ogni nastro verde
+// (analisi pixel: il resto del nastro è troppo scuro per l'inchiostro nero).
 export const DANNO_MOVIMENTO: Record<string, FieldPos> = {
-  dannoBonusFor: { x: 148, y: 554.38, size: 8 },
-  dannoBonusAgi: { x: 335, y: 554.38, size: 8 },
-  movimento: { x: 520, y: 554.38, size: 8, align: 'center' },
+  dannoBonusFor: { x: 167.5, y: 554.38, size: 9, align: 'center' },
+  dannoBonusAgi: { x: 355, y: 554.38, size: 9, align: 'center' },
+  movimento: { x: 542, y: 554.38, size: 9, align: 'center' },
 };
 
 export const CAPACITA_INCANTESIMI = {
   x: 22,
-  yStart: 507,
-  rowHeight: 12.6,
+  yStart: 499,
+  rowHeight: 14,
   size: 7,
 };
 
@@ -125,8 +127,8 @@ export const WEAPONS_TABLE = {
   durabX: 265.02,
   qualitaX: 309.34,
   qualitaMaxWidth: 85, // oltre si sconfina nel riquadro PUNTI FERITA a destra
-  yStart: 78,
-  rowHeight: 14.5,
+  yStart: 70, // misurato: le 3 righe stampate sono a y=67/50/33, 17pt di distanza reale
+  rowHeight: 17,
   size: 6.5,
 };
 
@@ -135,11 +137,12 @@ export const RIPOSO: Record<string, FieldPos> = {
   intervalloDiRiposo: { x: 487, y: 185.5, size: 8 },
 };
 
-// Solo il massimo va scritto qui (in nero, nello spazio bianco sotto l'etichetta):
-// i pallini di PV/PF attuali li spunta a matita il giocatore durante il gioco.
+// Solo il massimo va scritto qui, centrato nel quadretto bianco dedicato sotto
+// l'etichetta (misurato via analisi pixel: x 419-454, non al centro di tutta la
+// griglia di pallini). I pallini di PV/PF attuali li spunta a matita il giocatore.
 export const PV_PF = {
-  volontaMax: { x: 511, y: 150, size: 10, align: 'center' } as FieldPos,
-  feritaMax: { x: 511, y: 83.5, size: 10, align: 'center' } as FieldPos,
+  volontaMax: { x: 436, y: 141, size: 10, align: 'center' } as FieldPos,
+  feritaMax: { x: 436, y: 74, size: 10, align: 'center' } as FieldPos,
 };
 
 export const TIRI_MORTE = {
