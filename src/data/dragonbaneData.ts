@@ -351,6 +351,12 @@ export function calcMovimento(stirpe: string, agi: number | ''): number | '' {
   return kin.movimento + mod;
 }
 
+// pag. 30, Ingombro: metà della FOR (arrotondato per eccesso), +2 con lo zaino
+export function calcPesoTrasportabile(forza: number | '', haZaino: boolean): number | '' {
+  if (forza === '') return '';
+  return Math.ceil(forza / 2) + (haZaino ? 2 : 0);
+}
+
 // pag. 26, tabella D20 Debolezza. "label" è ciò che finisce scritto sulla scheda
 // (la riga Debolezza è stretta), "text" la descrizione completa mostrata nel form.
 export const DEBOLEZZE: { label: string; text: string }[] = [

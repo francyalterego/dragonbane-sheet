@@ -1,11 +1,11 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCharacter } from '../../state/CharacterContext';
-import { CIMELI, PROFESSIONI_INFO } from '../../data/dragonbaneData';
+import { calcPesoTrasportabile, CIMELI, PROFESSIONI_INFO } from '../../data/dragonbaneData';
 import { applyArmor, applyHelmet, ARMATURE, COPRICAPI } from '../../data/equipmentTables';
 import { parseEquipmentSet } from '../../data/equipmentParser';
 import { WeaponRow } from '../../types/character';
-import { NumberField, SectionCard, TextField } from './fields';
+import { Checkbox, NumberField, SectionCard, TextField } from './fields';
 
 const ALTRO = 'Altro';
 
@@ -15,6 +15,19 @@ export function InventarioSection() {
   const prof = PROFESSIONI_INFO.find((p) => p.nome === character.professione);
   const [equipSet, setEquipSet] = useState<number | null>(null);
   const [equipNotes, setEquipNotes] = useState<string[]>([]);
+
+  // pag. 30: peso trasportabile = metà della FOR (arrotondato per eccesso), +2 con lo zaino.
+  // Auto-lo ricalcoliamo finché il campo non viene toccato a mano.
+  const pesoCalc = calcPesoTrasportabile(character.attributes.FOR, character.haZaino);
+  const pesoCalcStr = pesoCalc === '' ? '' : String(pesoCalc);
+  useEffect(() => {
+    if (pesoCalcStr === '') return;
+    setCharacter((prev) =>
+      prev.pesoTrasportabile === '' || /^\d+$/.test(prev.pesoTrasportabile)
+        ? { ...prev, pesoTrasportabile: pesoCalcStr }
+        : prev
+    );
+  }, [pesoCalcStr]);
 
   function applyEquipmentSet(i: number) {
     if (!prof) return;
@@ -152,11 +165,19 @@ export function InventarioSection() {
             value={character.oggettiMinuscoli}
             onChange={(v) => update('oggettiMinuscoli', v)}
           />
-          <TextField
-            label="Peso trasportabile"
-            value={character.pesoTrasportabile}
-            onChange={(v) => update('pesoTrasportabile', v)}
-          />
+          <div>
+            <TextField
+              label="Peso trasportabile (oggetti d'Inventario, pag. 30)"
+              value={character.pesoTrasportabile}
+              onChange={(v) => update('pesoTrasportabile', v)}
+            />
+            <div className="mt-1 flex items-center justify-between">
+              <Checkbox label="Ho uno zaino (+2)" checked={character.haZaino} onChange={(v) => update('haZaino', v)} />
+              {pesoCalc !== '' && character.pesoTrasportabile !== pesoCalcStr && (
+                <span className="text-[10px] text-parchment-200/45">da manuale: {pesoCalc}</span>
+              )}
+            </div>
+          </div>
           <div className="grid grid-cols-3 gap-2">
             <NumberField label="Oro" value={character.oro} onChange={(v) => update('oro', v)} />
             <NumberField label="Argento" value={character.argento} onChange={(v) => update('argento', v)} />

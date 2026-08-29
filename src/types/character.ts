@@ -75,6 +75,7 @@ export interface Character {
   argento: number | '';
   rame: number | '';
   pesoTrasportabile: string;
+  haZaino: boolean;
 
   armatura: { nome: string; valore: number | ''; sciaguraSgattaiolare: boolean; sciaguraSfuggire: boolean; sciaguraAcrobazia: boolean };
   copricapo: { nome: string; valore: number | ''; sciaguraConsapevolezza: boolean; sciaguraAttacchiADistanza: boolean };
@@ -163,6 +164,7 @@ export function createEmptyCharacter(): Character {
     argento: '',
     rame: '',
     pesoTrasportabile: '',
+    haZaino: false,
     armatura: { nome: '', valore: '', sciaguraSgattaiolare: false, sciaguraSfuggire: false, sciaguraAcrobazia: false },
     copricapo: { nome: '', valore: '', sciaguraConsapevolezza: false, sciaguraAttacchiADistanza: false },
     armi: Array(3)
