@@ -71,8 +71,8 @@ export function AbilitaSection() {
 
   const allRows = [...character.skills, ...character.weaponSkills];
   const professionTrainedCount = allRows.filter((s) => s.allenata && trainableNames.has(s.name)).length;
-  const freeTrainedCount = allRows.filter((s) => s.allenata && !trainableNames.has(s.name)).length;
-  const freeCap = character.eta ? AGE_TRAINED_SKILLS[character.eta as EtaCategoria] - PROFESSION_CAP : null;
+  const totalTrainedCount = allRows.filter((s) => s.allenata).length;
+  const totalCap = character.eta ? AGE_TRAINED_SKILLS[character.eta as EtaCategoria] : null;
 
   function toggle<T extends Skill | WeaponSkill>(list: T[], i: number, key: 'skills' | 'weaponSkills') {
     const s = list[i];
@@ -84,10 +84,12 @@ export function AbilitaSection() {
     update(key, next as any);
   }
 
+  // Un solo tetto totale (8/10/12 in base all'età): almeno 6 devono venire dalla
+  // professione, ma questo è un requisito di provenienza, non un tetto separato che
+  // impedirebbe di allenare "in più" un'abilità della professione oltre le sei dedicate.
   function isDisabled(s: Skill | WeaponSkill) {
     if (s.allenata) return false; // si può sempre togliere la spunta
-    if (trainableNames.has(s.name)) return professionTrainedCount >= PROFESSION_CAP;
-    return freeCap !== null && freeTrainedCount >= freeCap;
+    return totalCap !== null && totalTrainedCount >= totalCap;
   }
 
   return (
@@ -99,8 +101,11 @@ export function AbilitaSection() {
         (Giovane), 4 (Adulto) o 6 (Vecchio).
       </p>
       <p className="mb-3 text-[11px] text-parchment-200/70">
-        Allenate dalla professione: {professionTrainedCount}/{PROFESSION_CAP} · Allenate libere:{' '}
-        {freeTrainedCount}/{freeCap ?? '?'} {!character.eta && '(scegli l\'età in Anagrafica per il limite)'}
+        Allenate: {totalTrainedCount}/{totalCap ?? '?'} {!character.eta && '(scegli l\'età in Anagrafica per il limite)'}
+        {' · '}di cui dalla professione: {professionTrainedCount}
+        {professionTrainedCount < PROFESSION_CAP && character.professione && (
+          <span className="text-dragon-red"> (almeno {PROFESSION_CAP} richieste)</span>
+        )}
       </p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>

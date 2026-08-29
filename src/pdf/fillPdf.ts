@@ -1,17 +1,21 @@
-import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, PDFFont, PDFPage, RGB, StandardFonts, rgb } from 'pdf-lib';
 import type { Character } from '../types/character';
 import { ATTRIBUTES } from '../types/character';
 import templateUrl from '../assets/scheda-template.pdf?url';
 import * as F from './fieldMap';
 
 const INK = rgb(0.09, 0.08, 0.07);
+// Per il testo che cade sui nastri verdi/rossi o sui badge scuri del template:
+// l'inchiostro scuro ci sparisce sopra, serve un colore chiaro.
+const INK_LIGHT = rgb(0.97, 0.95, 0.88);
 
 function drawText(
   page: PDFPage,
   font: PDFFont,
   text: string,
   pos: F.FieldPos,
-  fallbackSize = 8
+  fallbackSize = 8,
+  color: RGB = INK
 ) {
   if (!text) return;
   const size = pos.size ?? fallbackSize;
@@ -21,7 +25,14 @@ function drawText(
   } else if (pos.align === 'right') {
     x = pos.x - font.widthOfTextAtSize(text, size);
   }
-  page.drawText(text, { x, y: pos.y, size, font, color: INK });
+  page.drawText(text, { x, y: pos.y, size, font, color });
+}
+
+function truncateToWidth(font: PDFFont, text: string, size: number, maxWidth: number): string {
+  if (font.widthOfTextAtSize(text, size) <= maxWidth) return text;
+  let end = text.length;
+  while (end > 0 && font.widthOfTextAtSize(text.slice(0, end) + '…', size) > maxWidth) end--;
+  return text.slice(0, end) + '…';
 }
 
 function wrapLines(font: PDFFont, text: string, size: number, maxWidth: number): string[] {
@@ -108,10 +119,11 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
     }
   });
 
-  drawText(page, font, character.dannoBonusFor, F.DANNO_MOVIMENTO.dannoBonusFor);
-  drawText(page, font, character.dannoBonusAgi, F.DANNO_MOVIMENTO.dannoBonusAgi);
+  // Nastro verde scuro: serve inchiostro chiaro
+  drawText(page, fontBold, character.dannoBonusFor, F.DANNO_MOVIMENTO.dannoBonusFor, 8, INK_LIGHT);
+  drawText(page, fontBold, character.dannoBonusAgi, F.DANNO_MOVIMENTO.dannoBonusAgi, 8, INK_LIGHT);
   if (character.movimento !== '')
-    drawText(page, font, String(character.movimento), F.DANNO_MOVIMENTO.movimento);
+    drawText(page, fontBold, String(character.movimento), F.DANNO_MOVIMENTO.movimento, 8, INK_LIGHT);
 
   character.capacitaIncantesimi.forEach((text, i) => {
     if (!text) return;
@@ -126,7 +138,7 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
     if (s.value === '') return;
     drawText(page, fontBold, String(s.value), {
       x: F.SKILLS.valueX,
-      y: F.SKILLS.yStart - i * F.SKILLS.rowHeight,
+      y: F.SKILLS.yStart - i * F.SKILLS.rowHeight + 1,
       size: F.SKILLS.size,
     });
   });
@@ -135,7 +147,7 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
     if (s.value === '') return;
     drawText(page, fontBold, String(s.value), {
       x: F.WEAPON_SKILLS.valueX,
-      y: F.WEAPON_SKILLS.yStart - i * F.WEAPON_SKILLS.rowHeight,
+      y: F.WEAPON_SKILLS.yStart - i * F.WEAPON_SKILLS.rowHeight + 1,
       size: F.WEAPON_SKILLS.size,
     });
   });
@@ -144,7 +156,7 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
     const y = F.SECONDARY_SKILLS.yStart - i * F.SECONDARY_SKILLS.rowHeight;
     if (s.name) drawText(page, font, s.name, { x: F.SECONDARY_SKILLS.nameX, y, size: F.SECONDARY_SKILLS.size });
     if (s.value !== '')
-      drawText(page, fontBold, String(s.value), { x: F.SECONDARY_SKILLS.valueX, y, size: F.SECONDARY_SKILLS.size });
+      drawText(page, fontBold, String(s.value), { x: F.SECONDARY_SKILLS.valueX, y: y + 1, size: F.SECONDARY_SKILLS.size });
   });
 
   character.inventario.forEach((item, i) => {
@@ -167,8 +179,9 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
   if (character.rame !== '') drawText(page, font, String(character.rame), F.RESOURCES.rame);
 
   drawText(page, font, character.armatura.nome, F.ARMOR.armaturaNome);
+  // il badge "valore" dell'armatura è scuro: inchiostro chiaro
   if (character.armatura.valore !== '')
-    drawText(page, fontBold, String(character.armatura.valore), F.ARMOR.armaturaValore);
+    drawText(page, fontBold, String(character.armatura.valore), F.ARMOR.armaturaValore, 9, INK_LIGHT);
   drawText(page, font, character.copricapo.nome, F.ARMOR.copricapoNome);
   if (character.copricapo.valore !== '')
     drawText(page, fontBold, String(character.copricapo.valore), F.ARMOR.copricapoValore);
@@ -181,7 +194,11 @@ export async function fillCharacterSheet(character: Character): Promise<Uint8Arr
     if (w.portata) drawText(page, font, w.portata, { x: F.WEAPONS_TABLE.portataX, y, size: s });
     if (w.danno) drawText(page, font, w.danno, { x: F.WEAPONS_TABLE.dannoX, y, size: s });
     if (w.durabilita) drawText(page, font, w.durabilita, { x: F.WEAPONS_TABLE.durabX, y, size: s });
-    if (w.qualita) drawText(page, font, w.qualita, { x: F.WEAPONS_TABLE.qualitaX, y, size: s });
+    // la colonna Qualità è stretta: oltre non c'è più "bianco", si finisce sul riquadro PUNTI FERITA
+    if (w.qualita) {
+      const short = truncateToWidth(font, w.qualita, s, F.WEAPONS_TABLE.qualitaMaxWidth);
+      drawText(page, font, short, { x: F.WEAPONS_TABLE.qualitaX, y, size: s });
+    }
   });
 
   if (character.roundDiRiposo) drawCheck(page, font, F.RIPOSO.roundDiRiposo.x, F.RIPOSO.roundDiRiposo.y, 7);

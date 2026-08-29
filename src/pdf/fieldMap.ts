@@ -124,6 +124,7 @@ export const WEAPONS_TABLE = {
   dannoX: 220.51,
   durabX: 265.02,
   qualitaX: 309.34,
+  qualitaMaxWidth: 85, // oltre si sconfina nel riquadro PUNTI FERITA a destra
   yStart: 78,
   rowHeight: 14.5,
   size: 6.5,
@@ -137,8 +138,8 @@ export const RIPOSO: Record<string, FieldPos> = {
 // Solo il massimo va scritto qui (in nero, nello spazio bianco sotto l'etichetta):
 // i pallini di PV/PF attuali li spunta a matita il giocatore durante il gioco.
 export const PV_PF = {
-  volontaMax: { x: 421, y: 150, size: 10, align: 'left' } as FieldPos,
-  feritaMax: { x: 421, y: 83.5, size: 10, align: 'left' } as FieldPos,
+  volontaMax: { x: 511, y: 150, size: 10, align: 'center' } as FieldPos,
+  feritaMax: { x: 511, y: 83.5, size: 10, align: 'center' } as FieldPos,
 };
 
 export const TIRI_MORTE = {
