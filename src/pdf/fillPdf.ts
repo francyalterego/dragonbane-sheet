@@ -12,9 +12,6 @@ import templateUrl from "../assets/scheda-template.pdf?url";
 import * as F from "./fieldMap";
 
 const INK = rgb(0.09, 0.08, 0.07);
-// Per il testo che cade sui nastri verdi/rossi o sui badge scuri del template:
-// l'inchiostro scuro ci sparisce sopra, serve un colore chiaro.
-const INK_LIGHT = rgb(0.97, 0.95, 0.88);
 
 function drawText(
   page: PDFPage,
