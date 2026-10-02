@@ -9,7 +9,7 @@ export interface FieldPos {
   x: number;
   y: number;
   size?: number;
-  align?: 'left' | 'center' | 'right';
+  align?: "left" | "center" | "right";
 }
 
 export const HEADER: Record<string, FieldPos> = {
@@ -18,7 +18,7 @@ export const HEADER: Record<string, FieldPos> = {
   eta: { x: 168, y: 744, size: 8 },
   professione: { x: 112, y: 727, size: 8 },
   debolezza: { x: 112, y: 709, size: 6.5 },
-  nome: { x: 306, y: 671, size: 13, align: 'center' },
+  nome: { x: 306, y: 671, size: 13, align: "center" },
 };
 
 // Debolezza/Cimelio/Aspetto vanno a capo se lunghi (vedi drawWrappedText in fillPdf.ts).
@@ -26,7 +26,7 @@ export const HEADER: Record<string, FieldPos> = {
 // eventuali righe aggiuntive restano comunque nello spazio libero prima della riga successiva.
 export const DEBOLEZZA_WRAP = { maxWidth: 290, lineHeight: 8, maxLines: 3 };
 
-export interface WrapPos extends Omit<FieldPos, 'size'> {
+export interface WrapPos extends Omit<FieldPos, "size"> {
   size: number;
   maxWidth: number;
   lineHeight: number;
@@ -57,9 +57,9 @@ export const CONDITION_CHECK_DX = -29; // offset checkbox rispetto al centro del
 // x/y misurati individuando la "finestrella" chiara dentro ogni nastro verde
 // (analisi pixel: il resto del nastro è troppo scuro per l'inchiostro nero).
 export const DANNO_MOVIMENTO: Record<string, FieldPos> = {
-  dannoBonusFor: { x: 167.5, y: 554.38, size: 9, align: 'center' },
-  dannoBonusAgi: { x: 355, y: 554.38, size: 9, align: 'center' },
-  movimento: { x: 542, y: 554.38, size: 9, align: 'center' },
+  dannoBonusFor: { x: 167.5, y: 554.38, size: 9, align: "center" },
+  dannoBonusAgi: { x: 355, y: 554.38, size: 9, align: "center" },
+  movimento: { x: 542, y: 554.38, size: 9, align: "center" },
 };
 
 export const CAPACITA_INCANTESIMI = {
@@ -111,16 +111,16 @@ export const RESOURCES: Record<string, FieldPos> = {
   oggettiMinuscoli: { x: 462, y: 265, size: 7 },
   // finestrella color pergamena dentro il nastro INVENTARIO stesso (misurata: x 525-558),
   // non testo libero accanto all'etichetta come prima.
-  pesoTrasportabile: { x: 541, y: 519, size: 8, align: 'center' },
+  pesoTrasportabile: { x: 541, y: 519, size: 8, align: "center" },
 };
 
 // Centri dei badge (scudo/elmo) misurati via analisi pixel del loro interno chiaro:
 // non coincidono con il centro visivo "a occhio" del disegno, che include anche la base.
 export const ARMOR: Record<string, FieldPos> = {
-  armaturaNome: { x: 100, y: 165, size: 7 },
-  armaturaValore: { x: 51, y: 155, size: 9, align: 'center' },
-  copricapoNome: { x: 266, y: 165, size: 7 },
-  copricapoValore: { x: 224, y: 166, size: 9, align: 'center' },
+  armaturaNome: { x: 100, y: 160, size: 7 },
+  armaturaValore: { x: 61, y: 153, size: 9, align: "center" },
+  copricapoNome: { x: 266, y: 160, size: 7 },
+  copricapoValore: { x: 238, y: 163, size: 9, align: "center" },
 };
 
 export const WEAPONS_TABLE = {
@@ -145,8 +145,8 @@ export const RIPOSO: Record<string, FieldPos> = {
 // l'etichetta (misurato via analisi pixel: x 419-454, non al centro di tutta la
 // griglia di pallini). I pallini di PV/PF attuali li spunta a matita il giocatore.
 export const PV_PF = {
-  volontaMax: { x: 436, y: 141, size: 10, align: 'center' } as FieldPos,
-  feritaMax: { x: 436, y: 74, size: 10, align: 'center' } as FieldPos,
+  volontaMax: { x: 436, y: 141, size: 10, align: "center" } as FieldPos,
+  feritaMax: { x: 436, y: 74, size: 10, align: "center" } as FieldPos,
 };
 
 export const TIRI_MORTE = {
