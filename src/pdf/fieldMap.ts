@@ -114,11 +114,13 @@ export const RESOURCES: Record<string, FieldPos> = {
   pesoTrasportabile: { x: 541, y: 519, size: 8, align: 'center' },
 };
 
+// Centri dei badge (scudo/elmo) misurati via analisi pixel del loro interno chiaro:
+// non coincidono con il centro visivo "a occhio" del disegno, che include anche la base.
 export const ARMOR: Record<string, FieldPos> = {
   armaturaNome: { x: 100, y: 165, size: 7 },
-  armaturaValore: { x: 40, y: 165, size: 9, align: 'center' },
+  armaturaValore: { x: 51, y: 155, size: 9, align: 'center' },
   copricapoNome: { x: 266, y: 165, size: 7 },
-  copricapoValore: { x: 232, y: 165, size: 9, align: 'center' },
+  copricapoValore: { x: 224, y: 166, size: 9, align: 'center' },
 };
 
 export const WEAPONS_TABLE = {

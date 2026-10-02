@@ -46,9 +46,9 @@ const RESOURCES = {
 };
 const ARMOR = {
   armaturaNome: { x: 100, y: 165, size: 7 },
-  armaturaValore: { x: 40, y: 165, size: 9, align: 'center' },
+  armaturaValore: { x: 51, y: 155, size: 9, align: 'center' },
   copricapoNome: { x: 266, y: 165, size: 7 },
-  copricapoValore: { x: 232, y: 165, size: 9, align: 'center' },
+  copricapoValore: { x: 224, y: 166, size: 9, align: 'center' },
 };
 const WEAPONS_TABLE = {
   nomeX: 55.64, impX: 142.52, portataX: 172.49, dannoX: 220.51, durabX: 265.02, qualitaX: 309.34, qualitaMaxWidth: 85,
