@@ -30,3 +30,7 @@ scheda-grid-debug.pdf
 text-positions.json
 attr-check*.pdf
 template-highres.png
+
+# Contenuto del manuale (testo + immagini) usato dalla Wiki in sviluppo locale: materiale
+# protetto da copyright, non va mai committato nel repo pubblico. Vedi VITE_WIKI_FULL_CONTENT.
+public/wiki-content/

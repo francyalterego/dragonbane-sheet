@@ -8,11 +8,34 @@ import { Checkbox, NumberField, SectionCard } from './fields';
 const CONDITIONS: Condition[] = ['ESAUSTO', 'MALATICCIO', 'DISORIENTATO', 'ARRABBIATO', 'SPAVENTATO', 'SCORAGGIATO'];
 
 export function CaratteristicheSection() {
-  const { character, update } = useCharacter();
+  const { character, update, setCharacter } = useCharacter();
 
   const dannoBonusForCalc = calcDannoBonus(character.attributes.FOR);
   const dannoBonusAgiCalc = calcDannoBonus(character.attributes.AGI);
   const movimentoCalc = calcMovimento(character.stirpe, character.attributes.AGI);
+
+  // Pulsante "Ricalcola": una volta finalizzati gli attributi, risovrascrive tutti i valori
+  // derivati (anche quelli già impostati) invece di toccarli solo se vuoti come fanno gli
+  // effetti sotto. Comodo dopo aver cambiato un attributo a cose già compilate.
+  function recalcolaValoriDerivati() {
+    setCharacter((prev) => {
+      const dbFor = calcDannoBonus(prev.attributes.FOR);
+      const dbAgi = calcDannoBonus(prev.attributes.AGI);
+      const mov = calcMovimento(prev.stirpe, prev.attributes.AGI);
+      const pvMax = prev.attributes.VOL;
+      const pfMax = prev.attributes.COS;
+      return {
+        ...prev,
+        dannoBonusFor: dbFor || prev.dannoBonusFor,
+        dannoBonusAgi: dbAgi || prev.dannoBonusAgi,
+        movimento: mov !== '' ? mov : prev.movimento,
+        puntiVolontaMax: pvMax !== '' ? pvMax : prev.puntiVolontaMax,
+        puntiVolontaAttuali: pvMax !== '' ? pvMax : prev.puntiVolontaAttuali,
+        puntiFeritaMax: pfMax !== '' ? pfMax : prev.puntiFeritaMax,
+        puntiFeritaAttuali: pfMax !== '' ? pfMax : prev.puntiFeritaAttuali,
+      };
+    });
+  }
 
   // Compila da sola i campi derivati quando sono vuoti, così non tocchiamo eventuali
   // aggiustamenti manuali del giocatore (es. per capacità eroiche che li modificano).
@@ -50,6 +73,20 @@ export function CaratteristicheSection() {
             </div>
           );
         })}
+      </div>
+
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <p className="text-[11px] text-parchment-200/50">
+          Hai finalizzato gli attributi? Riallinea i valori che ne dipendono (anche quelli già impostati).
+        </p>
+        <button
+          type="button"
+          onClick={recalcolaValoriDerivati}
+          title="Riallinea Danno Bonus, Movimento e PV/PF massimi (e attuali) agli attributi attuali"
+          className="shrink-0 rounded border border-dragon-gold/40 px-2.5 py-1 text-xs hover:bg-dragon-gold/10"
+        >
+          🔄 Ricalcola valori derivati
+        </button>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">

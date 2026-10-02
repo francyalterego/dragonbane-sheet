@@ -20,7 +20,7 @@ export function WikiView() {
         />
       </div>
       <div className="flex flex-1 flex-col overflow-hidden rounded-lg border border-dragon-gold/25 bg-black/10 p-5">
-        <WikiContent title={selectedTitle} />
+        <WikiContent path={selectedPath} title={selectedTitle} />
       </div>
     </div>
   );
